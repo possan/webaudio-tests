@@ -1,0 +1,42 @@
+.indicator {
+	background-color: #050;
+}
+
+.indicator.on {
+	background-color: #3f3;
+}
+
+
+section.groups {
+	clear: both;
+}
+
+section.groups article {
+	position: relative;
+	border: 1px solid #ccc;
+	padding: 20px;
+	margin: 5px;
+	width: 300px;
+	float: left;
+}
+
+section.groups article .indicator {
+	position: absolute;
+	left: 0px;
+	right: 0px;
+	top: 0px;
+	height: 10px;
+}
+
+section.groups article h3 {
+	margin: 0 0 10px 0;
+}
+
+section.groups article p {
+	margin: 0 0 10px 0;
+}
+
+section.groups article textarea {
+	width: 280px;
+	height: 35px;
+}
