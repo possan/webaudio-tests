@@ -1,0 +1,535 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=200">
+<link rel="stylesheet" href="style.css" />
+<script type="text/javascript" src="buffer-loader.js"></script>
+<script type="text/javascript">
+
+var context = new webkitAudioContext();
+
+var compressor = context.createDynamicsCompressor();
+compressor.connect(context.destination);
+
+
+
+
+
+function DynamicValue(defaultvalue, interval) {
+	this.value = defaultvalue;
+	this.expression = '';
+	this.fun = null;
+	this.interval = interval;
+}
+
+DynamicValue.prototype.setFixedValue = function(fix) {
+	this.value = fix;
+	this.fun = null;
+}
+
+DynamicValue.prototype.getFixedValue = function() {
+	return this.value;
+}
+
+DynamicValue.prototype.setExpression = function(expr) {
+
+	//
+	// expr:
+	// step % 4 == 0
+	//
+	// code:
+	// function (step, substep, superstep, time) {
+	// return (step % 4 == 0)
+	// }
+	//
+
+	this.fun = 0;
+	this.expression = expr;
+	try {
+		var c = 'return ('+expr+');';
+		console.log('Compiling code: '+c);
+		var f = new Function(['step', 'substep', 'superstep', 'time'], c);
+		this.fun = f;
+	}	catch(e) {
+		console.error('Compilation error', e);
+	}
+
+}
+
+DynamicValue.prototype.evalValue = function(state) {
+	if (this.fun) {
+		// console.log('calling function', state);
+		return this.fun(state.step, state.substep, state.superstep, state.time);
+	}
+	return this.value;
+}
+
+
+
+
+
+
+function Track() {
+	this.values = [];
+	this.resolution = 8;
+	this.callback = null;
+}
+
+Track.prototype.addValue = function(value, speedy) {
+	this.values.push({
+		source: value,
+		highspeed: speedy,
+		value: 0.0,
+	});
+}
+
+Track.prototype.setResolution = function(res) {
+	this.resolution = res;
+}
+
+Track.prototype.getResolution = function() {
+	return this.resolution;
+}
+
+Track.prototype.step = function(state) {
+	// console.log('Track step', state);
+	var ss = state.superstep;
+	// check gate, fire off sound, all values are now evaluated and ready...
+	for(var i=0; i<this.values.length; i++) {
+		var t = this.values[i];
+		t.updated = false;
+		if (t.highspeed || (ss % this.resolution) == 0) {
+			// console.log('evaluate step, value #', i, state);
+			t.value = t.source.evalValue(state);
+			t.updated = true;
+		}
+	}
+	if (this.callback)
+		this.callback(this, state);
+}
+
+
+
+
+
+
+
+
+
+function Sequencer() {
+	this.bpm = 120;
+	this.timeperstep = 0;
+	this.supersteps = 8;
+	this.superstep = 0;
+	this.progress = 0;
+	this.progresstotal = 0;
+	this.tracks = [];
+}
+
+Sequencer.prototype.addTrack = function(track) {
+	this.tracks.push(track);
+}
+
+Sequencer.prototype._subtick = function(d) {
+	var st = Math.floor(this.superstep / this.supersteps);
+	var ss = this.superstep % this.supersteps;
+	// if (ss == 0)
+	// console.log('subtick', this.superstep, st, ss, d);
+
+	var state = {
+		step: st,
+		substep: ss,
+		superstep: this.superstep,
+		time: this.progresstotal / 1000.0
+	};
+
+	for (var i=0; i<this.tracks.length; i++) {
+		var t = this.tracks[i];
+		t.step(state);
+	}
+
+	this.superstep += 1;
+}
+
+Sequencer.prototype.setBPM = function(bpm) {
+	this.bpm = bpm;
+	this._updateBPM();
+}
+
+Sequencer.prototype._updateBPM = function() {
+	var bps = this.bpm / 60.0 * 4.0;
+	this.timeperstep =  (1000 / bps) / this.supersteps;
+	// console.log('time per superstep', this.timeperstep);
+}
+
+Sequencer.prototype.play = function() {
+	if (this.started)
+		return;
+	this.started = true;
+	this._updateBPM();
+	var self = this;
+	var lasttick = (new Date()).getTime();
+	this.progress = 0;
+	this.timer = setInterval(function() {
+		var t = (new Date()).getTime();
+		var dt = t - lasttick;
+		lasttick = t;
+		self.progress += dt;
+		self.progresstotal += dt;
+		if (self.progress < self.timeperstep)
+			return;
+		self.progress -= self.timeperstep;
+		self._subtick(self.progress);
+	}, 0);
+}
+
+Sequencer.prototype.stop = function() {
+	if (!this.started)
+		return;
+	this.started = false;
+	clearInterval(this.timer);
+	this.timer = 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+function createSampleTrack(gateid, volid, speedid, indicatorid, filename) {
+
+	var buffer = null;
+
+	var gatevalue = new DynamicValue(0);
+	var volvalue = new DynamicValue(100);
+	var speedvalue = new DynamicValue(100);
+
+	var gateeditor = document.getElementById(gateid);
+	gateeditor.addEventListener('change', function() {
+		gatevalue.setExpression(gateeditor.value);
+	});
+	gatevalue.setExpression(gateeditor.value);
+
+	var voleditor = document.getElementById(volid);
+	voleditor.addEventListener('change', function() {
+		volvalue.setExpression(voleditor.value);
+	});
+	volvalue.setExpression(voleditor.value);
+
+	var speededitor = document.getElementById(speedid);
+	speededitor.addEventListener('change', function() {
+		speedvalue.setExpression(speededitor.value);
+	});
+	speedvalue.setExpression(speededitor.value);
+
+	var gateindicator = document.getElementById(indicatorid);
+
+	var t = new Track();
+	t.addValue(gatevalue, false); // gate
+	t.addValue(volvalue, false); // volume
+	t.addValue(speedvalue, false); // speed
+
+	t.callback = function(t2, state) {
+		// console.log('sample track step', state);
+		// console.log('gate=', t2.values[0].value);
+		// console.log('vol=', t2.values[1].value);
+		// console.log('speed=', t2.values[2].value);
+		if (t2.values[0].updated && t2.values[0].value > 0.0) {
+			// if (state.superstep % 8 == 0) {
+			// console.log('trigger sample.', t2, state);
+
+			gateindicator.className = 'indicator on';
+			var source = context.createBufferSource();
+  	  source.buffer = buffer;
+  	  source.playbackRate.value = t2.values[2].value / 100.0;
+			source.loop = false;
+
+			var gainNode = context.createGainNode();
+    	gainNode.gain.setValueAtTime(t2.values[1].value / 100.0, context.currentTime);
+			source.connect(gainNode);
+
+			gainNode.connect(compressor);
+
+			source.noteOn(0.0);
+			setTimeout(function() {
+				source.noteOff(0);
+			}, 1000);
+		}
+		else
+			gateindicator.className = 'indicator';
+	};
+
+	var b = new BufferLoader(context, [
+		filename
+	], function(all) {
+		console.log('all loaded.', all);
+		buffer = all[0];
+	});
+	b.load();
+
+
+	return t;
+}
+
+function createSynthTrack(gateid, noteid, cutoffid, volid, resid, indicatorid) {
+
+	var filter = context.createBiquadFilter();
+	filter.type = 0;
+  filter.frequency.value = 0.0;
+	filter.connect(compressor);
+
+	var gatevalue = new DynamicValue(0);
+	var notevalue = new DynamicValue(36);
+	var cutvalue = new DynamicValue(20000);
+	var resvalue = new DynamicValue(0);
+	var relvalue = new DynamicValue(100);
+	var volvalue = new DynamicValue(100);
+
+	var gateeditor = document.getElementById(gateid);
+	var noteeditor = document.getElementById(noteid);
+	var cutoffeditor = document.getElementById(cutoffid);
+	var voleditor = document.getElementById(volid);
+	var reseditor = document.getElementById(resid);
+	var gateindicator = document.getElementById(indicatorid);
+
+	gateeditor.addEventListener('change', function() {
+		gatevalue.setExpression(gateeditor.value);
+	});
+	gatevalue.setExpression(gateeditor.value);
+
+	noteeditor.addEventListener('change', function() {
+		notevalue.setExpression(noteeditor.value);
+	});
+	notevalue.setExpression(noteeditor.value);
+
+	cutoffeditor.addEventListener('change', function() {
+		cutvalue.setExpression(cutoffeditor.value);
+	});
+	cutvalue.setExpression(cutoffeditor.value);
+
+	var voleditor = document.getElementById(volid);
+	voleditor.addEventListener('change', function() {
+		volvalue.setExpression(voleditor.value);
+	});
+	volvalue.setExpression(voleditor.value);
+
+	reseditor.addEventListener('change', function() {
+		resvalue.setExpression(reseditor.value);
+	});
+	resvalue.setExpression(reseditor.value);
+
+	var t = new Track();
+	t.addValue(gatevalue, false); // gate
+	t.addValue(notevalue, false); // note
+	t.addValue(cutvalue, true); // cutoff
+	t.addValue(resvalue, true); // resonance
+	t.addValue(relvalue, true); // release
+	t.addValue(volvalue, false); // release
+
+	t.callback = function(t2, state) {
+		//		console.log('synth track step', state);
+		//		console.log('gate=', t2.values[0].value);
+		//		console.log('note=', t2.values[1].value);
+		//		console.log('cut=', t2.values[2].value);
+		//		console.log('rez=', t2.values[3].value);
+		//		console.log('release=', t2.values[4].value);
+		//		if (t2.values[0].updated) {
+
+		if(t2.values[2].updated) {
+			// console.log('cut='+t2.values[2].value);
+		  filter.frequency.value = t2.values[2].value;
+		  filter.Q.value = t2.values[3].value;
+		}
+
+		if (t2.values[0].updated &&
+			t2.values[0].value > 0.0) {
+			var note = Math.round(t2.values[1].value);
+			var freq = 440.0*Math.pow(2.0, (note-49.0)/12.0);
+			// console.log('note='+note+', freq='+freq);
+			var release = 1.0 * t2.values[4].value;
+
+			// console.log('trigger synth.', t2, state);
+
+			var source = context.createOscillator();
+			source.type = 2; // sine wave
+			source.frequency.value = freq;
+
+			var gainNode = context.createGainNode();
+    	gainNode.gain.setValueAtTime(t2.values[5].value / 100.0, context.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.0, context.currentTime + release / 1000.0);
+			source.connect(gainNode);
+
+			gainNode.connect(filter);
+
+ 			gateindicator.className = 'indicator on';
+			source.noteOn(0);
+			setTimeout(function() {
+	 			gateindicator.className = 'indicator';
+				source.noteOff(0);
+			}, release);
+		}
+	};
+	return t;
+}
+
+	function updateScripts() {
+	}
+
+	function init() {
+
+		var seq = new Sequencer();
+		seq.setBPM(130.0);
+
+		var	lane1 = createSampleTrack('lane1', 'lane1vol', 'lane1speed', 'lane1indicator', '808kick3.mp3');
+		seq.addTrack(lane1);
+
+		var	lane2 = createSampleTrack('lane2', 'lane2vol', 'lane2speed', 'lane2indicator', '808snare1.mp3');
+		seq.addTrack(lane2);
+
+		var lane3 = createSampleTrack('lane3', 'lane3vol', 'lane3speed', 'lane3indicator', '808chh1.mp3');
+		seq.addTrack(lane3);
+
+		var lane4 = createSampleTrack('lane4', 'lane4vol', 'lane4speed', 'lane4indicator', '808clap.mp3');
+		seq.addTrack(lane4);
+
+		var bass1 = createSynthTrack('bass1', 'bass2', 'bass3', 'bass4', 'bass5', 'bassindicator');
+		seq.addTrack(bass1);
+
+		updateScripts();
+
+		var bpmfield = document.getElementById('bpm');
+
+		document.getElementById('play').addEventListener('click', function() {
+			var v = document.getElementById('bpm').value;
+			seq.setBPM(0.0 + parseFloat(bpmfield.value));
+			seq.play();
+		});
+
+		document.getElementById('stop').addEventListener('click', function() {
+			seq.stop();
+		});
+
+		bpmfield.addEventListener('change', function() {
+			seq.setBPM(0.0 + parseFloat(bpmfield.value));
+		});
+
+	}
+
+
+</script>
+</head>
+<body onload="init();">
+
+	<h1>Expression drum machine + synth</h1>
+
+	<button id="play">PLAY</button>
+	<button id="stop">STOP</button>
+	&nbsp;
+	bpm:
+	<input id="bpm" value="130" size="5"></input>
+
+	<section class="groups">
+
+		<article>
+			<h3>Kick</h3>
+			<div id="lane1indicator" class="indicator"></div>
+			<p>
+				Gate: (0-1)<br/>
+				<textarea id="lane1" rows="3" cols="50">(step % 16 == 0) || (step % 16 == 10)</textarea>
+			</p>
+			<p>
+				Volume: (%)<br/>
+				<textarea id="lane1vol" rows="3" cols="50">150</textarea>
+			</p>
+			<p>
+				Playback speed: (%)<br/>
+				<textarea id="lane1speed" rows="3" cols="50">125</textarea>
+			</p>
+		</article>
+
+		<article>
+			<h3>Snare</h3>
+			<div id="lane2indicator" class="indicator"></div>
+			<p>
+				Gate: (0-1)<br/>
+				<textarea id="lane2" rows="3" cols="50">(step % 8 == 4)</textarea>
+			</p>
+			<p>
+				Volume: (%)<br/>
+				<textarea id="lane2vol" rows="3" cols="50">150</textarea>
+			</p>
+			<p>
+				Playback speed: (%)<br/>
+				<textarea id="lane2speed" rows="3" cols="50">40</textarea>
+			</p>
+		</article>
+
+		<article>
+			<h3>Hat</h3>
+			<div id="lane3indicator" class="indicator"></div>
+			<p>
+				Gate: (0-1)<br/>
+				<textarea id="lane3" rows="3" cols="50">step % 8 &gt; 4</textarea>
+			</p>
+			<p>
+				Volume: (%)<br/>
+				<textarea id="lane3vol" rows="3" cols="50">50</textarea>
+			</p>
+			<p>
+				Playback speed: (%)<br/>
+				<textarea id="lane3speed" rows="3" cols="50">100</textarea>
+			</p>
+		</article>
+
+		<article>
+			<h3>Clap</h3>
+			<div id="lane4indicator" class="indicator"></div>
+			<p>
+				Gate: (0-1)<br/>
+				<textarea id="lane4" rows="3" cols="50">step % 32 == 8</textarea>
+			</p>
+			<p>
+				Volume: (%)<br/>
+				<textarea id="lane4vol" rows="3" cols="50">100</textarea>
+			</p>
+			<p>
+				Playback speed: (%)<br/>
+				<textarea id="lane4speed" rows="3" cols="50">150</textarea>
+			</p>
+		</article>
+
+		<article>
+			<h3>Bass:</h3>
+			<div id="bassindicator" class="indicator"></div>
+			<p>
+				Gate: (0 - 1)<br/>
+				<textarea id="bass1" rows="5" cols="50">step % 4 != 1</textarea>
+			</p>
+			<p>
+				Note: (midi key)<br/>
+				<textarea id="bass2" rows="5" cols="50">((step % 4) &lt; 2) ?  12 : 24</textarea>
+			</p>
+			<p>
+				Cutoff freq: (hz)<br/>
+				<textarea id="bass3" rows="5" cols="50">3000 + (2000 * Math.sin(time * 1.3))</textarea>
+			</p>
+			<p>
+				Resonance: (0-1+)<br/>
+				<textarea id="bass5" rows="5" cols="50">2.5</textarea>
+			</p>
+			<p>
+				Release time: (ms)<br/>
+				<textarea id="bass4" rows="5" cols="50">40</textarea>
+			</p>
+		</article>
+	</section>
+
+</body>
+</html>
