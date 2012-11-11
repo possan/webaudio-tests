@@ -14,9 +14,9 @@ section.groups {
 section.groups article {
 	position: relative;
 	border: 1px solid #ccc;
-	padding: 20px;
+	padding: 10px;
 	margin: 5px;
-	width: 300px;
+	width: 200px;
 	float: left;
 }
 
@@ -32,11 +32,38 @@ section.groups article h3 {
 	margin: 0 0 10px 0;
 }
 
+section.groups article ul {
+	display: block;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+section.groups article ul li {
+	display: block;
+	padding: 0;
+	margin: 0 0 10px 0;
+}
+
+section.groups article h2 {
+	margin: 0 0 15px 0;
+}
+
+section.groups article h4 {
+	font-weight: normal;
+	margin: 0 0 0 0;
+}
+
 section.groups article p {
 	margin: 0 0 10px 0;
 }
 
-section.groups article textarea {
-	width: 280px;
-	height: 35px;
+section.groups article textarea,
+section.groups article input.expression {
+	width: 160px;
 }
+
+hr {
+	clear: both;
+}
+
