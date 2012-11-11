@@ -4,45 +4,23 @@
 <meta name="viewport" content="width=200">
 <link rel="stylesheet" href="style.css" />
 <script type="text/javascript" src="buffer-loader.js"></script>
+
+<script src="src/song.js"></script>
+<script src="src/mixer.js"></script>
+<script src="src/sampler.js"></script>
+<script src="src/dynamicvalue.js"></script>
+<script src="src/sequencer.js"></script>
+<script src="src/track.js"></script>
+<script src="src/machine.js"></script>
+
+
 <script type="text/javascript">
 
-
-
-
-
-
 var context = new webkitAudioContext();
-
-var compressor = context.createDynamicsCompressor();
-compressor.connect(context.destination);
-
-
-
-
-
-function Song() {
-	this.data = {
-		tracks: [],
-		meta: {
-			name: '',
-			author: '',
-		},
-		sequencer: {
-			bpm: 130,
-			shuffle: 50
-		}
-	};
-	this.dirty = true;
-}
-
-Song.prototype.load = function(def) {
-}
-
-Song.prototype.save = function(def) {
-}
-
-
+var machine = new Machine(context);
 var song = new Song();
+var mixer = new Mixer();
+var sampler = new Sampler();
 
 song.data.tracks = [
 	{
@@ -68,248 +46,6 @@ song.data.tracks = [
 	}
 ];
 
-
-
-
-
-function Mixer() {
-}
-
-Mixer.prototype.addInput = function(input) {
-}
-
-
-
-
-
-function Sampler() {
-	this.buffers = [];
-	this.names = [];
-}
-
-Sampler.prototype.load = function(data) {
-	var self = this;
-	var b = new BufferLoader(
-		context,
-		data.map(function(item) { return item.url; }),
-		function(all) {
-			console.log('all loaded.', all);
-			self.buffers = all;
-		}
-	);
-	b.load();
-	data.forEach(function(item) {
-		self.names.push(item.name);
-	})
-}
-
-
-
-
-
-
-
-
-function DynamicValue(defaultvalue, interval) {
-	this.value = defaultvalue;
-	this.expression = '';
-	this.fun = null;
-	this.interval = interval;
-}
-
-DynamicValue.prototype.setFixedValue = function(fix) {
-	this.value = fix;
-	this.fun = null;
-}
-
-DynamicValue.prototype.getFixedValue = function() {
-	return this.value;
-}
-
-DynamicValue.prototype.setExpression = function(expr) {
-
-	//
-	// expr:
-	// step % 4 == 0
-	//
-	// code:
-	// function (step, substep, superstep, time) {
-	// return (step % 4 == 0)
-	// }
-	//
-
-	this.fun = 0;
-	this.expression = expr;
-	try {
-		var c = 'return ('+expr+');';
-		console.log('Compiling code: '+c);
-		var f = new Function(['step', 'substep', 'superstep', 'time'], c);
-		this.fun = f;
-	}	catch(e) {
-		console.error('Compilation error', e);
-	}
-
-}
-
-DynamicValue.prototype.evalValue = function(state) {
-	if (this.fun) {
-		// console.log('calling function', state);
-		return this.fun(state.step, state.substep, state.superstep, state.time);
-	}
-	return this.value;
-}
-
-
-
-
-
-
-function Track() {
-	this.values = [];
-	this.resolution = 8;
-	this.callback = null;
-}
-
-Track.prototype.addValue = function(value, speedy) {
-	this.values.push({
-		source: value,
-		highspeed: speedy,
-		value: 0.0,
-	});
-}
-
-Track.prototype.setResolution = function(res) {
-	this.resolution = res;
-}
-
-Track.prototype.getResolution = function() {
-	return this.resolution;
-}
-
-Track.prototype.step = function(state) {
-	// console.log('Track step', state);
-	var ss = state.superstep;
-	// check gate, fire off sound, all values are now evaluated and ready...
-	for(var i=0; i<this.values.length; i++) {
-		var t = this.values[i];
-		t.updated = false;
-		if (t.highspeed || (ss % this.resolution) == 0) {
-			// console.log('evaluate step, value #', i, state);
-			t.value = t.source.evalValue(state);
-			t.updated = true;
-		}
-	}
-	if (this.callback)
-		this.callback(this, state);
-}
-
-
-
-
-
-
-
-
-
-function Sequencer() {
-	this.bpm = 120;
-	this.shuffle = 0;
-	this.timeperstep = 0;
-	this.timeperstep2 = 0;
-	this.supersteps = 8;
-	this.halfsupersteps = this.supersteps / 2;
-	this.superstep = 0;
-	this.progress = 0;
-	this.progresstotal = 0;
-	this.tracks = [];
-}
-
-Sequencer.prototype.addTrack = function(track) {
-	this.tracks.push(track);
-}
-
-Sequencer.prototype._subtick = function(d) {
-	var st = Math.floor(this.superstep / this.supersteps);
-	var ss = this.superstep % this.supersteps;
-	// if (ss == 0)
-	// console.log('subtick', this.superstep, st, ss, d);
-
-	var state = {
-		step: st,
-		substep: ss,
-		superstep: this.superstep,
-		time: this.progresstotal / 1000.0
-	};
-
-	for (var i=0; i<this.tracks.length; i++) {
-		var t = this.tracks[i];
-		t.step(state);
-	}
-
-	this.superstep += 1;
-}
-
-Sequencer.prototype.setBPM = function(bpm) {
-	this.bpm = bpm;
-	this._updateBPM();
-}
-
-Sequencer.prototype.setShuffle = function(shuffle) {
-	this.shuffle = shuffle;
-	this._updateBPM();
-}
-
-Sequencer.prototype._updateBPM = function() {
-	var bps = this.bpm / 60.0 * 4.0;
-	var tps =  (1000 / bps) / this.supersteps;
-	var s = Math.max(-90, Math.min(90, this.shuffle))
-	var st = tps * s / 200;
-	this.timeperstep = tps + st;
-	this.timeperstep2 = tps - st;
-	// console.log('time per superstep', this.timeperstep);
-}
-
-Sequencer.prototype.play = function() {
-	if (this.started)
-		return;
-	this.started = true;
-	this._updateBPM();
-	var self = this;
-	var lasttick = (new Date()).getTime();
-	this.progress = 0;
-	this.timer = setInterval(function() {
-		var t = (new Date()).getTime();
-		var dt = t - lasttick;
-		lasttick = t;
-		self.progress += dt;
-		self.progresstotal += dt;
-		var ss = Math.floor(self.superstep / self.supersteps);
-		// var sh = self.supersteps / 2;
-		var tps = (ss % 2 < 1) ? self.timeperstep : self.timeperstep2;
-		if (self.progress < tps)
-			return;
-		// console.log('tps='+tps);
-		self.progress -= tps;
-		self._subtick(self.progress);
-	}, 1);
-}
-
-Sequencer.prototype.stop = function() {
-	if (!this.started)
-		return;
-	this.started = false;
-	clearInterval(this.timer);
-	this.timer = 0;
-}
-
-
-
-
-
-
-var mixer = new Mixer();
-
-var sampler = new Sampler();
 sampler.load([
 	{ url: '808kick3.mp3', name: '808 Kick' },
 	{ url: '808snare1.mp3', name: '808 Snare' },
@@ -318,23 +54,20 @@ sampler.load([
 	{ url: '808kick1.mp3', name: '808 Kick 2' }
 ]);
 
-
-
-
 function createExpressionEditor(defaultvalue, editorelement) {
 	var gatevalue = new DynamicValue(defaultvalue);
-	var gateeditor = document.getElementById(editorelement);
+	/*var gateeditor = document.getElementById(editorelement);
 	gateeditor.addEventListener('change', function() {
 		gatevalue.setExpression(gateeditor.value);
 	});
 	gatevalue.setExpression(gateeditor.value);
+	*/
 	return gatevalue;
 }
 
 
 
-
-function createSampleTrack(gateid, volid, speedid, indicatorid, waveid, relid, sampler) {
+createSampleTrack = function(gateid, volid, speedid, indicatorid, waveid, relid, sampler) {
 
 	var gatevalue = createExpressionEditor(0, gateid);
 	var volvalue = createExpressionEditor(100, volid);
@@ -351,43 +84,11 @@ function createSampleTrack(gateid, volid, speedid, indicatorid, waveid, relid, s
 	t.addValue(wavevalue, false); // wave
 	t.addValue(relvalue, false); // release
 
-	t.callback = function(t2, state) {
-		// console.log('sample track step', state);
-		// console.log('gate=', t2.values[0].value);
-		// console.log('vol=', t2.values[1].value);
-		// console.log('speed=', t2.values[2].value);
-		if (t2.values[0].updated && t2.values[0].value > 0.0) {
-			// if (state.superstep % 8 == 0) {
-			// console.log('trigger sample.', t2, state);
-
-			gateindicator.className = 'indicator on';
-			var source = context.createBufferSource();
-			var w = Math.floor(t2.values[3].value);
-  	  source.buffer = sampler.buffers[w % sampler.buffers.length];
-  	  source.playbackRate.value = t2.values[2].value / 100.0;
-			source.loop = false;
-
-			var release = 1.0 * t2.values[4].value;
-			var gainNode = context.createGainNode();
-    	gainNode.gain.setValueAtTime(t2.values[1].value / 100.0, context.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.0, context.currentTime + release / 1000.0);
-			source.connect(gainNode);
-
-			gainNode.connect(compressor);
-
-			source.noteOn(0.0);
-			setTimeout(function() {
-				source.noteOff(0);
-			}, 1000);
-		}
-		else
-			gateindicator.className = 'indicator';
-	};
-
+	t.callback = Track.createSampleTrackCallback();
 	return t;
 }
 
-function createSynthTrack(gateid, noteid, cutoffid, volid, resid, waveid, relid, indicatorid) {
+createSynthTrack = function(gateid, noteid, cutoffid, volid, resid, waveid, relid, indicatorid){
 
 	var filter = context.createBiquadFilter();
 	filter.type = 0;
@@ -413,53 +114,9 @@ function createSynthTrack(gateid, noteid, cutoffid, volid, resid, waveid, relid,
 	t.addValue(volvalue, false); // volume
 	t.addValue(wavevalue, false); // wave
 
-	t.callback = function(t2, state) {
-		//		console.log('synth track step', state);
-		//		console.log('gate=', t2.values[0].value);
-		//		console.log('note=', t2.values[1].value);
-		//		console.log('cut=', t2.values[2].value);
-		//		console.log('rez=', t2.values[3].value);
-		//		console.log('release=', t2.values[4].value);
-		//		if (t2.values[0].updated) {
-
-		if(t2.values[2].updated) {
-			// console.log('cut='+t2.values[2].value);
-		  filter.frequency.value = t2.values[2].value;
-		  filter.Q.value = t2.values[3].value;
-		}
-
-		if (t2.values[0].updated &&
-			t2.values[0].value > 0.0) {
-			var note = Math.round(t2.values[1].value);
-			var freq = 440.0*Math.pow(2.0, (note-49.0)/12.0);
-			// console.log('note='+note+', freq='+freq);
-
-			// console.log('trigger synth.', t2, state);
-
-			var source = context.createOscillator();
-			source.type = t2.values[6].value;
-			source.frequency.value = freq;
-
-			var release = 1.0 * t2.values[4].value;
-			var gainNode = context.createGainNode();
-    	gainNode.gain.setValueAtTime(t2.values[5].value / 100.0, context.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.0, context.currentTime + release / 1000.0);
-			source.connect(gainNode);
-
-			gainNode.connect(filter);
-
- 			gateindicator.className = 'indicator on';
-			source.noteOn(0);
-			setTimeout(function() {
-	 			gateindicator.className = 'indicator';
-				source.noteOff(0);
-			}, release);
-		}
-	};
+	t.callback = Track.createSynthTrackCallback();
 	return t;
 }
-
-
 
 
 
@@ -701,12 +358,6 @@ function createSynthTrack(gateid, noteid, cutoffid, volid, resid, waveid, relid,
 			document.getElementById('json').value = JSON.stringify(song.data, null, 2);
 		}, 500);
 
-
-
-		/*
-
-
-
 		var	lane1 = createSampleTrack(
 			'lane1',
 			'lane1vol',
@@ -757,8 +408,7 @@ function createSynthTrack(gateid, noteid, cutoffid, volid, resid, waveid, relid,
 			'bass7',
 			'bassindicator');
 		seq.addTrack(bass1);
-		*/
-
+	
 
 	}
 

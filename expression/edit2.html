@@ -4,11 +4,26 @@
 	<meta name="viewport" content="width=200">
 	<meta name="viewport" content="width=device-width" />
 	<link rel="stylesheet" href="style.css" />
+	<zzscript src="http://code.angularjs.org/1.1.0/angular.js"></zzscript>
+	<script type="text/javascript" src="buffer-loader.js"></script>
+
+	<script src="src/song.js"></script>
+	<script src="src/mixer.js"></script>
+	<script src="src/sampler.js"></script>
+	<script src="src/dynamicvalue.js"></script>
+	<script src="src/sequencer.js"></script>
+	<script src="src/track.js"></script>
+	<script src="src/machine.js"></script>
+
 	<script src="src/angular.js"></script>
-	<script data-main="src/main" src="src/require.js"></script>
+
+	<script src="src/app.js"></script>
+	<script src="src/controllers/studio.js"></script>
+	<script src="src/bootstrap.js"></script>
+	<script src="src/all.js"></script>
 </head>
-<body>
-	<div >
+<body onload="bootstrap();">
+	<div ng-controller="StudioController">
 		<input type="button" value="play" ng-click="play();"/>
 		<input type="button" value="stop" ng-click="stop();"/>
 		&nbsp;
@@ -19,12 +34,12 @@
 		<input type="text" size="2" ng-model="dataset.shuffle" ng-change="updatePlayback()" />
 		%	
 		<hr/>
-		<input type="button" value="add synth" ng-click="addSynth()">
 		<section class="groups" id="groups">
-			<article ng-repeat="item in dataset.items" ng-include="getItemTemplate(item)"></article>
+			<article ng-repeat="item in dataset.tracks" ng-include="getItemTemplate(item)"></article>
 		</section>
 		<input type="button" value="add synth" ng-click="addSynth()">
 		<input type="button" value="add sampler" ng-click="addSampler()">
+		<hr/>
 		<textarea id="json2" cols="100" rows="20"
 			ng-model="dataset_json"
 			ng-change="json_changed()"></textarea>
