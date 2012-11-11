@@ -1,0 +1,14 @@
+<span>
+	<br/>
+	<input id="x" type="checkbox" ng-model="prop.dynamic" ng-change="saveMyModel()" />
+	<label for="x">Use expr.:</label>
+	<br/>
+
+	<span ng-hide="prop.dynamic">
+		<input type="text" size="4" placeholder="Value" ng-model="prop.value" ng-change="saveMyModel()"  />
+	</span>
+
+	<span ng-show="prop.dynamic">
+		<input type="text" placeholder="Expression" class="expression" ng-model="prop.expr" ng-change="saveMyModel()" />
+	</span>
+</span>

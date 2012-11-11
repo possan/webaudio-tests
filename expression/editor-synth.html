@@ -1,0 +1,10 @@
+<div id="lane4indicator" class="indicator"></div>
+<p>Synth:	<input type="text" ng-model="item.title" ng-change="saveMyModel()" /></p>
+<ul>
+<li ng-repeat="prop in [item.gate]" ng-include="'prop-gate.html'"></li>
+<li ng-repeat="prop in [item.note]" ng-include="'prop-note.html'"></li>
+<li ng-repeat="prop in [item.wave]" ng-include="'prop-waveform.html'"></li>
+<li ng-repeat="prop in [item.rel]" ng-include="'prop-release.html'"></li>
+<li ng-repeat="prop in [item.cutoff]" ng-include="'prop-cutoff.html'"></li>
+<li ng-repeat="prop in [item.reso]" ng-include="'prop-resonance.html'"></li>
+</ul>

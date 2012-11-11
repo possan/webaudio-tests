@@ -1,0 +1,9 @@
+<div id="lane4indicator" class="indicator"></div>
+<p>Sampler:	<input type="text" ng-model="item.title" ng-change="saveMyModel()" /></p>
+<ul>
+<li ng-repeat="prop in [item.gate]" ng-include="'prop-gate.html'"></li>
+<li ng-repeat="prop in [item.speed]" ng-include="'prop-speed.html'"></li>
+<li ng-repeat="prop in [item.samp]" ng-include="'prop-sample.html'"></li>
+<li ng-repeat="prop in [item.rel]" ng-include="'prop-release.html'"></li>
+<li ng-repeat="prop in [item.vol]" ng-include="'prop-volume.html'"></li>
+</ul>

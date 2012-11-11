@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head>
+	<meta name="viewport" content="width=200">
+	<meta name="viewport" content="width=device-width" />
+	<link rel="stylesheet" href="style.css" />
+	<script src="src/angular.js"></script>
+	<script data-main="src/main" src="src/require.js"></script>
+</head>
+<body>
+	<div >
+		<input type="button" value="play" ng-click="play();"/>
+		<input type="button" value="stop" ng-click="stop();"/>
+		&nbsp;
+		BPM:
+		<input type="text" size="3" ng-model="dataset.bpm" ng-change="updatePlayback()" />
+		&nbsp;
+		Shuffle:
+		<input type="text" size="2" ng-model="dataset.shuffle" ng-change="updatePlayback()" />
+		%	
+		<hr/>
+		<input type="button" value="add synth" ng-click="addSynth()">
+		<section class="groups" id="groups">
+			<article ng-repeat="item in dataset.items" ng-include="getItemTemplate(item)"></article>
+		</section>
+		<input type="button" value="add synth" ng-click="addSynth()">
+		<input type="button" value="add sampler" ng-click="addSampler()">
+		<textarea id="json2" cols="100" rows="20"
+			ng-model="dataset_json"
+			ng-change="json_changed()"></textarea>
+	</div>
+</body>
+</html>
