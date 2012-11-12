@@ -77,8 +77,7 @@ function StudioController($scope) {
 	}
 
 	$scope.saveMyModel = function() {
-		$scope.dataset_json = JSON.stringify($scope.dataset);
-		console.log('x', JSON.stringify($scope.dataset));
+		$scope.dataset_json = JSON.stringify($scope.dataset, undefined, 2);
 		Machine.getInstance().setData($scope.dataset);
 	}
 
