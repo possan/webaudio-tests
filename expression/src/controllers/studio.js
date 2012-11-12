@@ -39,6 +39,7 @@ function StudioController($scope) {
 	}; 
 	*/
 	$scope.play = function() {
+		$scope._updateMutes();
 		$scope.updatePlayback();
 		console.log('play!');
 		machine.play();
@@ -50,7 +51,7 @@ function StudioController($scope) {
 	}
 
 	$scope.updatePlayback =function() {
-		console.log('update playback!');
+		$scope.saveMyModel();
 	}
 
 	$scope.getItemTemplate = function(x) {
@@ -65,7 +66,11 @@ function StudioController($scope) {
 
 	$scope.addSynth = function() {
 		console.log('addSynth', $scope);
-		$scope.dataset.tracks.push({ type: 'synth',
+		$scope.dataset.tracks.push({
+			type: 'synth',
+			title: 'New synth',
+			mute: false,
+			solo: false,
 			gate: { dynamic: false, value: 0, expr: 'step % 4 == 0'},
 			note: { dynamic: false, value: 24, expr: '36 + step % 4'},
 			volume: { dynamic: false, value: 100 },
@@ -81,6 +86,9 @@ function StudioController($scope) {
 		console.log('addSampler', $scope);
 		$scope.dataset.tracks.push({
 			type: 'sampler',
+			title: 'New sampler',
+			mute: false,
+			solo: false,
 			gate: { dynamic: false, value: 0 },
 			sample: { dynamic: true, value: 0 },
 			volume: { dynamic: false, value: 100 },
@@ -98,12 +106,40 @@ function StudioController($scope) {
 		$scope.saveMyModel();
 	}
 
+	$scope._updateMutes = function() {
+		var nsolo = 0;
+		$scope.dataset.tracks.forEach(function(track) {
+			if (track.solo) nsolo ++;
+		});
+		$scope.dataset.tracks.forEach(function(track) {
+			track.silent = false;
+			if (nsolo > 0) {
+				track.silent = !track.solo;
+			} else {
+				track.silent = track.mute;
+			}
+		});
+	}
+
+	$scope.muteTrack = function(track) {
+		track.mute = !track.mute;
+		$scope._updateMutes();
+		$scope.saveMyModel();
+	}
+
+	$scope.soloTrack = function(track) {
+		track.solo = !track.solo;
+		$scope._updateMutes();
+		$scope.saveMyModel();
+	}
+
 	$scope.json_changed = function() {
 		$scope.dataset = JSON.parse($scope.dataset_json);
 		$scope.saveMyModel();
 	}
 
 	console.log($scope.dataset);
+	$scope._updateMutes();
 	$scope.saveMyModel();
 };
 

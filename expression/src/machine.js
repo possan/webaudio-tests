@@ -164,8 +164,8 @@ Machine.prototype.setData = function(data) {
 	}
 
 	this.song.data = data;
-	this.sequencer.setBPM(this.song.data.bpm);
-	this.sequencer.setShuffle(this.song.data.shuffle);
+	this.sequencer.setBPM(data.bpm);
+	this.sequencer.setShuffle(data.shuffle);
 
 	for (var i=0; i<this.sequencer.tracks.length; i++) {
 		this.sequencer.tracks[i].release();
@@ -186,6 +186,7 @@ Machine.prototype.setData = function(data) {
 				addDynamicValueTrack(t, intrack.release || {}, false); // release 4
 				addDynamicValueTrack(t, intrack.volume || {}, false); // volume 5
 				addDynamicValueTrack(t, intrack.waveform || {}, false); // wave 6
+				t.silent = intrack.silent || false;
 				t.callback = this.createSynthTrackCallback();
 				this.sequencer.tracks.push(t);
 			} else if (intrack.type === 'sampler' ) {
@@ -195,6 +196,7 @@ Machine.prototype.setData = function(data) {
 				addDynamicValueTrack(t, intrack.speed || {}, false); // playback speed 2
 				addDynamicValueTrack(t, intrack.sample || {}, false); // sample 3
 				addDynamicValueTrack(t, intrack.release || {}, false); // release 4
+				t.silent = intrack.silent || false;
 				t.callback = this.createSamplerTrackCallback();
 				this.sequencer.tracks.push(t);
 			}

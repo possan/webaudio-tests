@@ -1,5 +1,10 @@
 <div id="lane4indicator" class="indicator"></div>
 <p>
+	<button ng-click="muteTrack(item);" ng-show="item.mute || false">UNMUTE</button>
+	<button ng-click="muteTrack(item);" ng-hide="item.mute || false">MUTE</button>
+	<button ng-click="soloTrack(item);" ng-show="item.solo || false">UNSOLO</button>
+	<button ng-click="soloTrack(item);" ng-hide="item.solo || false">SOLO</button>
+
 	Sampler:	<input type="text" size="10" ng-model="item.title" ng-change="saveMyModel()" /> 
 	<button ng-click="deleteTrack(item);">X</button></a>
 </p>
