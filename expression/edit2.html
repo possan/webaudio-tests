@@ -37,8 +37,14 @@
 		<section class="groups" id="groups">
 			<article ng-repeat="item in dataset.tracks" ng-include="getItemTemplate(item)"></article>
 		</section>
+		<hr/>
 		<input type="button" value="add synth" ng-click="addSynth()">
 		<input type="button" value="add sampler" ng-click="addSampler()">
+		<hr/>
+		<section class="groups" id="groups2">
+			<article ng-repeat="item in dataset.buses" ng-include="getItemTemplate(item)"></article>
+			<article ng-repeat="item in [dataset.master || {}]" ng-include="getItemTemplate(item)"></article>
+		</section>
 		<hr/>
 		<textarea id="json2" cols="100" rows="20"
 			ng-model="dataset_json"

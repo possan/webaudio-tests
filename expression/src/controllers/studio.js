@@ -38,6 +38,24 @@ function StudioController($scope) {
 		]
 	}; 
 	*/
+
+	if (typeof($scope.dataset.buses) === 'undefined')
+		$scope.dataset.buses = [];
+
+	if ($scope.dataset.buses.length < 1)
+		$scope.dataset.buses.push({});
+
+	if ($scope.dataset.buses.length < 2)
+		$scope.dataset.buses.push({});
+
+	$scope.dataset.buses[0].type = 'bus';
+	$scope.dataset.buses[1].type = 'bus';
+
+	if (typeof($scope.dataset.master) === 'undefined')
+		$scope.dataset.master = {};
+
+	$scope.dataset.master.type = 'master';
+
 	$scope.play = function() {
 		$scope._updateMutes();
 		$scope.updatePlayback();
@@ -77,7 +95,10 @@ function StudioController($scope) {
 			cutoff: { dynamic: false, value: 10000 },
 			resonance: { dynamic: false, value: 0 },
 			release: { dynamic: false, value: 80 },
-			speed: { dynamic: false, speed: 100 },
+			speed: { dynamic: false, value: 100 },
+			waveform: { dynamic: false, value: 1 },
+			send1: { dynamic: false, value: 0 },
+			send2: { dynamic: false, value: 0 },
 		});
 		// $scope.saveMyModel();
 	}
@@ -93,7 +114,9 @@ function StudioController($scope) {
 			sample: { dynamic: true, value: 0 },
 			volume: { dynamic: false, value: 100 },
 			release: { dynamic: false, value: 80 },
-			speed: { dynamic: false, speed: 100 },
+			speed: { dynamic: false, value: 100 },
+			send1: { dynamic: false, value: 0 },
+			send2: { dynamic: false, value: 0 },
 	 	});
 		// $scope.saveMyModel();
 	}
