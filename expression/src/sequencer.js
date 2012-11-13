@@ -30,8 +30,7 @@ Sequencer.prototype._subtick = function(d) {
 	};
 
 	for (var i=0; i<this.tracks.length; i++) {
-		var t = this.tracks[i];
-		t.step(state);
+		this.tracks[i].step(state);
 	}
 
 	this.superstep += 1;

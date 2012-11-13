@@ -3,6 +3,7 @@ function Track() {
 	this.values = [];
 	this.resolution = 8;
 	this.callback = null;
+	this.silent = false;
 }
 
 Track.prototype.addValue = function(value, speedy) {
@@ -25,6 +26,8 @@ Track.prototype.release = function() {
 }
 
 Track.prototype.step = function(state) {
+	if (this.silent)
+		return;
 	// console.log('Track step', state);
 	var ss = state.superstep;
 	// check gate, fire off sound, all values are now evaluated and ready...
