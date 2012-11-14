@@ -189,16 +189,42 @@ machine.setData(
   "buses": [
     {
       "type": "bus",
-      "$$hashKey": "02T"
+      "$$hashKey": "02T",
+      "delaytime": {
+        dynamic: false,
+        value: 90
+      },
+      "delayfeedback": {
+        value: 66,
+        dynamic: true,
+        expression: '40 + 30*Math.sin(time)'
+      }
     },
     {
       "type": "bus",
-      "$$hashKey": "02V"
+      "$$hashKey": "02V",
+      "delaytime": {
+        dynamic: false,
+        value: 250
+      },
+      "delayfeedback": {
+        value: 66,
+        dynamic: false,
+        expression: '40 + 30*Math.sin(time)'
+      }
     }
   ],
   "master": {
     "type": "master",
-    "$$hashKey": "02X"
+    "$$hashKey": "02X",
+    "receive1": {
+      dynamic: false,
+      value: 25
+    },
+    "receive2": {
+      dynamic: false,
+      value: 33
+    }
   }
 }
 

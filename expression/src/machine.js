@@ -1,7 +1,16 @@
 Machine = function(context) {
 	this.context = context;
 
-	// dummy busses
+	this.song = new Song();
+	this.mixer = new Mixer();
+	this.sampler = new Sampler();
+	this.sequencer = new Sequencer();
+	this.sequencer.mixer = this.mixer;
+
+	this.devices = [];
+	this.devicemap = {};
+
+	// device output busses
 	this.bus1 = context.createGainNode();
 	this.bus2 = context.createGainNode();
 	this.drybus = context.createGainNode();
@@ -10,33 +19,23 @@ Machine = function(context) {
 	this.receive1 = context.createGainNode();
 	this.receive2 = context.createGainNode();
 
-	// bus1 effects
-	this.bus1delay = context.createDelayNode();
-	this.bus1delay.delayTime.value = 0.5;
-	this.bus1.connect(this.bus1delay);
-	this.bus1delay.connect(this.receive1);
+	// master track
+	this.mixer.mastertrack = this.createDevice({type:'master'});
+	this.mixer.mastertrack.device.outputpin.connect(context.destination);
+	this.receive1.connect(this.mixer.mastertrack.device.receive1);
+	this.receive2.connect(this.mixer.mastertrack.device.receive2);
+	this.drybus.connect(this.mixer.mastertrack.device.inputpin);
 
-	// bus2 effects
-	this.bus2delay = context.createDelayNode();
-	this.bus2delay.delayTime.value = 0.33;
-	this.bus2.connect(this.bus2delay);
-	this.bus2delay.connect(this.receive2);
+	// bus 1
+	this.mixer.bustrack1 = this.createDevice({type:'bus'});
+	this.bus1.connect(this.mixer.bustrack1.device.inputpin);
+	this.mixer.bustrack1.device.outputpin.connect(this.receive1);
 
+	// bus 2
+	this.mixer.bustrack2 = this.createDevice({type:'bus'});
+	this.bus2.connect(this.mixer.bustrack2.device.inputpin);
+	this.mixer.bustrack2.device.outputpin.connect(this.receive2);
 
-	// output compressor
-	this.compressor = context.createDynamicsCompressor();
-
-	// master mixdown
-	this.drybus.connect(this.compressor);
-	this.receive1.connect(this.compressor);
-	this.receive2.connect(this.compressor);
-
-	// master output
-	this.compressor.connect(context.destination);
-
-	this.song = new Song();
-	this.sampler = new Sampler();
-	this.sequencer = new Sequencer();
 	this.reset();
 	window.machine = this;
 }
@@ -50,13 +49,13 @@ Machine.prototype.reset = function() {
 		bpm: 110.0,
 		shuffle: 25.0,
 		tracks: [
-		 /*	{
-				type: 'sampler',
-				sample: { value: 0, dynamic: false },
-				gate: { expr: 'step % 4 == 0', dynamic: true },
-				volume: { value: 100, dynamic: false },
-				speed: { value: 100, dynamic: false },
-				release: { value: 100, dynamic: false }
+		 	/*	{
+			type: 'sampler',
+			sample: { value: 0, dynamic: false },
+			gate: { expr: 'step % 4 == 0', dynamic: true },
+			volume: { value: 100, dynamic: false },
+			speed: { value: 100, dynamic: false },
+			release: { value: 100, dynamic: false }
 			}, */
 			{
 				type: 'synth',
@@ -73,6 +72,9 @@ Machine.prototype.reset = function() {
 	});
 }
 
+Machine.prototype.generateId = function() {
+	return '_'+Math.floor(Math.random() * 10000000);
+}
 
 Machine.prototype.load = function(data) {
 	this.song.load(data);
@@ -90,165 +92,56 @@ Machine.prototype.stop = function() {
 	this.sequencer.stop();
 }
 
-Machine.prototype.createSamplerTrackCallback = function() {
-	var self = this;
-
-	var output = self.context.createGainNode();
-	output.gain.value = 1.0;
-	output.connect(self.drybus);
-
-	var send1Node = self.context.createGainNode();
-	send1Node.gain.value = 1.0;
-	output.connect(send1Node);
-	send1Node.connect(self.bus1);
-
-	var send2Node = self.context.createGainNode();
-	send2Node.gain.value = 1.0;
-	output.connect(send2Node);
-	send2Node.connect(self.bus2);
-
-	return function(t2, state) {
-		// console.log('sample track step', state);
-		// console.log('gate=', t2.values[0].value);
-		// console.log('vol=', t2.values[1].value);
-		// console.log('speed=', t2.values[2].value);
-		// console.log('sample=', t2.values[3].value);
-		// console.log('release=', t2.values[4].value);
-		// console.log('send1=', t2.values[5].value);
-		// console.log('send2=', t2.values[6].value);
-
-		if(t2.values[5].updated) {
-			// console.log('send1='+t2.values[5].value);
-		  send1Node.gain.value = t2.values[5].value / 100.0;
-		}
-
-		if(t2.values[6].updated) {
-			// console.log('send2='+t2.values[6].value);
-		  send2Node.gain.value = t2.values[6].value / 100.0;
-		}
-
-		if (t2.values[0].updated && t2.values[0].value > 0.0) {
-			// if (state.superstep % 8 == 0) {
-			// console.log('trigger sample.', t2, state);
-
-			// gateindicator.className = 'indicator on';
-			var source = self.context.createBufferSource();
-			var w = Math.floor(t2.values[3].value);
-  	  source.buffer = self.sampler.buffers[w % self.sampler.buffers.length];
-  	  source.playbackRate.value = t2.values[2].value / 100.0;
-			source.loop = false;
-
-			var release = 1.0 * t2.values[4].value;
-			var gainNode = self.context.createGainNode();
-    	gainNode.gain.setValueAtTime(t2.values[1].value / 100.0, context.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.0, context.currentTime + release / 1000.0);
-			source.connect(gainNode);
-
-			gainNode.connect(output);
-
-			source.noteOn(0.0);
-			setTimeout(function() {
-				source.noteOff(0);
-			}, 1000);
-		}
-		//	else
-		//		gateindicator.className = 'indicator';
-	};
+var addDynamicValueTrack = function(target, id, input, speedy) {
+	console.log('addDynamicValueTrack', input);
+	var value = new DynamicValue(input.value || 0.0);
+	value.value = input.value || 0.0;
+	if (input.dynamic && input.expression)
+		value.setExpression(input.expression);
+	target.addValue(value, id, speedy);
 }
 
-
-Machine.prototype.createSynthTrackCallback = function() {
-	var self = this;
-
-	var output = self.context.createGainNode();
-
-	var filter = self.context.createBiquadFilter();
-	filter.type = 0;
-  filter.frequency.value = 0.0;
-	filter.connect(self.drybus);
-
-	output.connect(filter);
-
-	var send1Node = self.context.createGainNode();
-	send1Node.gain.value = 1.0;
-	filter.connect(send1Node);
-	send1Node.connect(self.bus1);
-
-	var send2Node = self.context.createGainNode();
-	send2Node.gain.value = 1.0;
-	filter.connect(send2Node);
-	send2Node.connect(self.bus2);
-
-	return function(t2, state) {
-		/*
-		console.log('synth track step', state);
-		console.log('gate=', t2.values[0].value);
-		console.log('note=', t2.values[1].value);
-		console.log('cut=', t2.values[2].value);
-		console.log('rez=', t2.values[3].value);
-		console.log('release=', t2.values[4].value);
-		console.log('vol=', t2.values[5].value);
-		console.log('waveform=', t2.values[6].value);
-		console.log('send1=', t2.values[7].value);
-		console.log('send2=', t2.values[8].value);
-		*/
-		if(t2.values[2].updated) {
-			// console.log('cut='+t2.values[2].value);
-		  filter.frequency.value = t2.values[2].value;
-		  filter.Q.value = t2.values[3].value / 100.0;
-		}
-
-		if(t2.values[7].updated) {
-			// console.log('send1='+t2.values[7].value);
-		  send1Node.gain.value = t2.values[7].value / 100.0;
-		}
-
-		if(t2.values[8].updated) {
-			// console.log('send2='+t2.values[8].value);
-		  send2Node.gain.value = t2.values[8].value / 100.0;
-		}
-
-		if (t2.values[0].updated &&
-			t2.values[0].value > 0.0) {
-			var note = Math.round(t2.values[1].value);
-			var freq = 440.0*Math.pow(2.0, (note-49.0)/12.0);
-			// console.log('note='+note+', freq='+freq);
-
-			// console.log('trigger synth.', t2, state);
-
-			var source = self.context.createOscillator();
-			source.type = t2.values[6].value;
-			source.frequency.value = freq;
-
-			var release = 1.0 * t2.values[4].value;
-
-			var gainNode = self.context.createGainNode();
-    	gainNode.gain.setValueAtTime(t2.values[5].value / 100.0, context.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.0, context.currentTime + release / 1000.0);
-			source.connect(gainNode);
-
-			gainNode.connect(output);
-
- 			// gateindicator.className = 'indicator on';
-			source.noteOn(0);
-			setTimeout(function() {
-	 			// gateindicator.className = 'indicator';
-				source.noteOff(0);
-			}, release);
-		}
-	};
-}
-
-Machine.prototype.setData = function(data) {
-
-	var addDynamicValueTrack = function(target, input, speedy) {
-		console.log('addDynamicValueTrack', input);
+var addDynamicValueTracks = function(target, intrack) {
+	for (var i=0; i<target.device.parameters.length; i++) {
+		var p = target.device.parameters[i];
+		var input = intrack[p.id] || {};
 		var value = new DynamicValue(input.value || 0.0);
 		value.value = input.value || 0.0;
 		if (input.dynamic && input.expression)
 			value.setExpression(input.expression);
-		target.addValue(value, speedy);
+		target.addValue(value, p.id, p.substep);
 	}
+}
+
+Machine.prototype.createTrackDeviceWrapper = function(device, intrack) {
+	var t = new Track();
+	t.device = device;
+	t.device.machine = this;
+	t.device.create();
+	addDynamicValueTracks(t, intrack);
+	t.silent = intrack.silent || false;
+	if (t.device.createCallback)
+		t.callback = t.device.createCallback();
+	return t;
+}
+
+Machine.prototype.createDevice = function(intrack) {
+	if (intrack.type === 'synth')
+		return this.createTrackDeviceWrapper(new SynthDevice(), intrack);
+
+	if (intrack.type === 'sampler')
+		return this.createTrackDeviceWrapper(new SamplerDevice(), intrack);
+
+	if (intrack.type === 'bus')
+		return this.createTrackDeviceWrapper(new BusDevice(), intrack);
+
+	if (intrack.type === 'master')
+		return this.createTrackDeviceWrapper(new MasterDevice(), intrack);
+
+	return undefined;
+}
+
+Machine.prototype.setData = function(data) {
 
 	this.song.data = data;
 	this.sequencer.setBPM(data.bpm);
@@ -263,34 +156,18 @@ Machine.prototype.setData = function(data) {
 	if (data.tracks) {
 		for (var i=0; i<data.tracks.length; i++) {
 			console.log('migrate track #'+i, data.tracks[i]);
-			var intrack = data.tracks[i];
-			if (intrack.type === 'synth') {
-				var t = new Track();
-				addDynamicValueTrack(t, intrack.gate || {}, false); // gate 0
-				addDynamicValueTrack(t, intrack.note || {}, false); // note 1
-				addDynamicValueTrack(t, intrack.cutoff || {}, true); // cutoff 2
-				addDynamicValueTrack(t, intrack.resonance || {}, true); // resonance 3
-				addDynamicValueTrack(t, intrack.release || {}, false); // release 4
-				addDynamicValueTrack(t, intrack.volume || {}, false); // volume 5
-				addDynamicValueTrack(t, intrack.waveform || {}, false); // wave 6
-				addDynamicValueTrack(t, intrack.send1 || {}, false); // send1 7
-				addDynamicValueTrack(t, intrack.send2 || {}, false); // send2 8
-				t.silent = intrack.silent || false;
-				t.callback = this.createSynthTrackCallback();
-				this.sequencer.tracks.push(t);
-			} else if (intrack.type === 'sampler' ) {
-				var t = new Track();
-				addDynamicValueTrack(t, intrack.gate || {}, false); // gate 0
-				addDynamicValueTrack(t, intrack.volume || {}, false); // volume 1
-				addDynamicValueTrack(t, intrack.speed || {}, false); // playback speed 2
-				addDynamicValueTrack(t, intrack.sample || {}, false); // sample 3
-				addDynamicValueTrack(t, intrack.release || {}, false); // release 4
-				addDynamicValueTrack(t, intrack.send1 || {}, false); // send1 5
-				addDynamicValueTrack(t, intrack.send2 || {}, false); // send2 6
-				t.silent = intrack.silent || false;
-				t.callback = this.createSamplerTrackCallback();
-				this.sequencer.tracks.push(t);
-			}
+			var intrack = data.tracks[i] || {};
+			var t = this.createDevice(intrack);
+			this.sequencer.tracks.push(t);
 		}
 	}
+
+	if (this.mixer.bustrack1 && data.buses)
+		this.mixer.bustrack1.setData(data.buses[0] || {});
+
+	if (this.mixer.bustrack2 && data.buses)
+		this.mixer.bustrack2.setData(data.buses[1] || {});
+
+	if (this.mixer.mastertrack)
+		this.mixer.mastertrack.setData(data.master || {});
 }

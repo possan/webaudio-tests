@@ -17,7 +17,6 @@ DynamicValue.prototype.getFixedValue = function() {
 }
 
 DynamicValue.prototype.setExpression = function(expr) {
-
 	//
 	// expr:
 	// step % 4 == 0
@@ -27,12 +26,12 @@ DynamicValue.prototype.setExpression = function(expr) {
 	// return (step % 4 == 0)
 	// }
 	//
-	console.log('setExpression', expr);
+	// console.log('setExpression', expr);
 	this.fun = 0;
 	this.expression = expr;
 	try {
 		var c = 'return ('+expr+');';
-		console.log('Compiling code: '+c);
+		// console.log('Compiling code: '+c);
 		var f = new Function(['step', 'substep', 'superstep', 'time'], c);
 		// try to run it once too...
 		var t = f(1,2,3,4);
@@ -40,8 +39,6 @@ DynamicValue.prototype.setExpression = function(expr) {
 	}	catch(e) {
 		console.error('Compilation error', e);
 	}
-
-
 }
 
 DynamicValue.prototype.evalValue = function(state) {
