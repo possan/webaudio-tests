@@ -10,6 +10,7 @@ function Sequencer() {
 	this.progress = 0;
 	this.progresstotal = 0;
 	this.tracks = [];
+	this.mixer = null;
 }
 
 Sequencer.prototype.addTrack = function(track) {
@@ -32,6 +33,9 @@ Sequencer.prototype._subtick = function(d) {
 	for (var i=0; i<this.tracks.length; i++) {
 		this.tracks[i].step(state);
 	}
+
+	if (this.mixer)
+		this.mixer.step(state);
 
 	this.superstep += 1;
 }
