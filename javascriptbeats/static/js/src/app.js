@@ -124,11 +124,11 @@ machine.setData(
 );
 
 machine.sampler.load([
-	{ url: '808kick3.mp3', name: '808 Kick' },
-	{ url: '808snare1.mp3', name: '808 Snare' },
-	{ url: '808chh1.mp3', name: '808 Closed Hihat' },
-	{ url: '808clap.mp3', name: '808 Clap' },
-	{ url: '808kick1.mp3', name: '808 Kick 2' }
+	{ url: '/static/audio/808kick3.mp3', name: '808 Kick' },
+	{ url: '/static/audio/808snare1.mp3', name: '808 Snare' },
+	{ url: '/static/audio/808chh1.mp3', name: '808 Closed Hihat' },
+	{ url: '/static/audio/808clap.mp3', name: '808 Clap' },
+	{ url: '/static/audio/808kick1.mp3', name: '808 Kick 2' }
 ]);
 
 document.addEventListener('keydown', function(e) {
