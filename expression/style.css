@@ -1,6 +1,13 @@
 body {
 	font: 9pt Arial;
+	margin: 0;
+	padding: 0;
+	background-color: #c0c0c0;
+	background-color: #368;
 }
+
+
+
 
 
 .indicator {
@@ -14,23 +21,25 @@ body {
 
 section.groups {
 	clear: both;
+	padding: 20px;
+	background-color: #fff;
 }
 
 section.groups article {
 	position: relative;
 	border: 1px solid #ccc;
 	padding: 10px;
-	margin: 2px;
+	margin: 0 5px 5px 0;
 	width: 250px;
-	height: 400px;
+	height: 260px;
 	float: left;
 }
 
 section.groups article h3 {
 	position: absolute;
-	left: 40px;
+	left: 5px;
 	top: 5px;
-	width: 200px;
+	width: 150px;
 	margin: 0;
 	padding: 0;
 }
@@ -43,9 +52,13 @@ section.groups article .indicator {
 	height: 10px;
 }
 
+section.groups > br {
+	clear: both;
+}
+
 section.groups article button.mutebutton {
 	position: absolute;
-	right: 40px;
+	right: 80px;
 	top: 0px;
 	width: 40px;
 	height: 30px;
@@ -58,7 +71,7 @@ section.groups article button.mutebutton.down {
 
 section.groups article button.solobutton {
 	position: absolute;
-	right: 0px;
+	right: 40px;
 	top: 0px;
 	width: 40px;
 	height: 30px;
@@ -71,7 +84,7 @@ section.groups article button.solobutton.down {
 
 section.groups article button.deletebutton {
 	position: absolute;
-	left: 0px;
+	right: 0px;
 	top: 0px;
 	width: 30px;
 	height: 30px;
@@ -87,14 +100,10 @@ section.groups article h4 {
 	margin: 0 0 0 0;
 }
 
-section.groups article p {
-	margin: 0 0 10px 0;
-}
-
 section.groups article textarea,
 section.groups article input.expression {
 	position: absolute;
-	right: 0px;
+	right: 2px;
 	top: 0px;
 	width: 160px;
 	float: right;
@@ -108,7 +117,7 @@ ul.props {
 	position: absolute;
 	left: 0px;
 	top: 30px;
-	width: 250px;
+	right: 0px;
 	display: block;
 	margin: 0;
 	padding: 0;
@@ -116,7 +125,6 @@ ul.props {
 
 ul.props li {
 	position: relative;
-	width: 250px;
 	border-bottom: 1px solid #888;
 	border-top: 1px solid #ddd;
 	display: block;
@@ -125,4 +133,85 @@ ul.props li {
 
 ul.props li.half {
 	width: 125px;
+}
+
+
+
+
+
+
+
+section.transport {
+	padding: 0px;
+	height: 45px;
+	color: #fff;
+	text-shadow: 0 1px 1px #000;
+	background-image: -webkit-linear-gradient(bottom, rgb(37,107,128), rgb(61,166,204));
+}
+
+section.transport ul {
+	display: block;
+	margin: 0;
+	padding: 0;
+}
+
+section.transport ul li {
+	display: block;
+	list-style: none;
+	float: left;
+	margin: 0;
+	margin-right: 15px;
+	padding: 0;
+}
+
+section.transport ul li.logo {
+	position: relative;
+	height: 40px;
+	width: 200px;
+	white-space: nowrap;
+}
+
+section.transport ul li.logo h1 {
+	position: absolute;
+	left: 10px;
+	top: 6px;
+	margin: 0;
+	padding: 0;
+	font-size: 15pt;
+}
+
+section.transport ul li.logo h2 {
+	position: absolute;
+	left: 10px;
+	top: 26px;
+	margin: 0;
+	padding: 0;
+	font-size: 8pt;
+}
+
+section.transport ul li.label {
+	margin-top: 11px;
+}
+
+section.transport ul li.label span {
+
+}
+
+section.transport ul li.buttons {
+	margin-top: 3px;
+}
+
+section.transport ul li.buttons input[type="button"] {
+	padding: 10px 15px;
+	background-color: #eee;
+	border: 0px solid #888;
+	border-radius: 5px;
+	box-shadow: 0 1px 0 rgba(0,0,0,0.5);
+	color: #000;
+	cursor: pointer;
+}
+
+section.transport ul li.buttons input[type="button"]:hover {
+	background-color: #fff;
+	color: #555;
 }
