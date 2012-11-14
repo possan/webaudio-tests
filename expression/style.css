@@ -1,9 +1,8 @@
 body {
-	font: 9pt Arial;
+	font: 8pt Arial;
 	margin: 0;
-	padding: 0;
-	background-color: #c0c0c0;
-	background-color: #368;
+	padding: 80px 20px 80px 20px;
+	background-color: #fff;
 }
 
 
@@ -18,27 +17,31 @@ body {
 	background-color: #3f3;
 }
 
-
 section.groups {
 	clear: both;
-	padding: 20px;
-	background-color: #fff;
+	padding: 0px;
 }
 
 section.groups article {
 	position: relative;
-	border: 1px solid #ccc;
-	padding: 10px;
+	border: 0px;
+	padding: 0px;
 	margin: 0 5px 5px 0;
 	width: 250px;
-	height: 260px;
+	height: 280px;
 	float: left;
 }
 
-section.groups article h3 {
+section.groups article header {
+	background-color: #666;
+	height: 35px;
+	color: #fff;
+}
+
+section.groups article header h3 {
 	position: absolute;
-	left: 5px;
-	top: 5px;
+	left: 10px;
+	top: 10px;
 	width: 150px;
 	margin: 0;
 	padding: 0;
@@ -59,10 +62,12 @@ section.groups > br {
 section.groups article button.mutebutton {
 	position: absolute;
 	right: 80px;
-	top: 0px;
+	top: 5px;
 	width: 40px;
-	height: 30px;
+	height: 25px;
 	background-color: #a88;
+	border: 0;
+	border-radius: 10px;
 }
 
 section.groups article button.mutebutton.down {
@@ -71,11 +76,13 @@ section.groups article button.mutebutton.down {
 
 section.groups article button.solobutton {
 	position: absolute;
-	right: 40px;
-	top: 0px;
+	right: 35px;
+	top: 5px;
 	width: 40px;
-	height: 30px;
+	height: 25px;
 	background-color: #8a8;
+	border: 0;
+	border-radius: 10px;
 }
 
 section.groups article button.solobutton.down {
@@ -84,11 +91,13 @@ section.groups article button.solobutton.down {
 
 section.groups article button.deletebutton {
 	position: absolute;
-	right: 0px;
-	top: 0px;
-	width: 30px;
-	height: 30px;
+	right: 5px;
+	top: 5px;
+	width: 25px;
+	height: 25px;
 	background-color: #ccc;
+	border: 0;
+	border-radius: 10px;
 }
 
 section.groups article h2 {
@@ -100,15 +109,6 @@ section.groups article h4 {
 	margin: 0 0 0 0;
 }
 
-section.groups article textarea,
-section.groups article input.expression {
-	position: absolute;
-	right: 2px;
-	top: 0px;
-	width: 160px;
-	float: right;
-}
-
 hr {
 	clear: both;
 }
@@ -116,7 +116,7 @@ hr {
 ul.props {
 	position: absolute;
 	left: 0px;
-	top: 30px;
+	top: 35px;
 	right: 0px;
 	display: block;
 	margin: 0;
@@ -128,11 +128,16 @@ ul.props li {
 	border-bottom: 1px solid #888;
 	border-top: 1px solid #ddd;
 	display: block;
-	padding: 5px;
+	background-color: #ddd;
+	padding: 6px;
 }
 
-ul.props li.half {
-	width: 125px;
+ul.props li input.expression {
+	position: absolute;
+	right: 2px;
+	top: 0px;
+	width: 130px;
+	float: right;
 }
 
 
@@ -142,11 +147,17 @@ ul.props li.half {
 
 
 section.transport {
+	position: fixed;
+	left: 0px;
+	top: 0px;
+	width: 100%;
 	padding: 0px;
 	height: 45px;
 	color: #fff;
 	text-shadow: 0 1px 1px #000;
 	background-image: -webkit-linear-gradient(bottom, rgb(37,107,128), rgb(61,166,204));
+	z-index: 99;
+	box-shadow: 0 4px 10px rgba(0,0,0,0.33);
 }
 
 section.transport ul {

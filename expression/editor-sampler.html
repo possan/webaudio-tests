@@ -1,41 +1,40 @@
-<button ng-click="muteTrack(item);" class="mutebutton down" ng-show="item.mute || false">UNMUTE</button>
-<button ng-click="muteTrack(item);" class="mutebutton     " ng-hide="item.mute || false">MUTE</button>
-<button ng-click="soloTrack(item);" class="solobutton down" ng-show="item.solo || false">UNSOLO</button>
-<button ng-click="soloTrack(item);" class="solobutton     " ng-hide="item.solo || false">SOLO</button>
-<button ng-click="deleteTrack(item);" class="deletebutton">X</button>
-
-<h3>
-	Sampler:
-	<input type="text" size="10" ng-model="item.title" ng-change="saveMyModel()" />
-</h3>
-
+<header>
+	<h3>
+		Sampler:
+	</h3>
+	<button ng-click="muteTrack(item);" class="mutebutton down" ng-show="item.mute || false">UNMUTE</button>
+	<button ng-click="muteTrack(item);" class="mutebutton     " ng-hide="item.mute || false">MUTE</button>
+	<button ng-click="soloTrack(item);" class="solobutton down" ng-show="item.solo || false">UNSOLO</button>
+	<button ng-click="soloTrack(item);" class="solobutton     " ng-hide="item.solo || false">SOLO</button>
+	<button ng-click="deleteTrack(item);" class="deletebutton">X</button>
+</header>
 <ul class="props">
 	<li>
-		Gate:
+		Gate: (0-1)
 		<input type="text" placeholder="Expression" class="expression" ng-model="item.gate" ng-change="saveMyModel()" />
 	</li>
 	<li>
-		Speed:
+		Speed: (%)
 		<input type="text" placeholder="Expression" class="expression" ng-model="item.speed" ng-change="saveMyModel()" />
 	</li>
 	<li>
-		Sample:
+		Sample: (n)
 		<input type="text" placeholder="Expression" class="expression" ng-model="item.sample" ng-change="saveMyModel()" />
 	</li>
 	<li>
-		Release:
+		Release: (ms)
 		<input type="text" placeholder="Expression" class="expression" ng-model="item.release" ng-change="saveMyModel()" />
 	</li>
 	<li>
-		Volume:
+		Volume: (%)
 		<input type="text" placeholder="Expression" class="expression" ng-model="item.volume" ng-change="saveMyModel()" />
 	</li>
 	<li>
-		Bus 1 send:
+		Bus 1 send: (%)
 		<input type="text" placeholder="Expression" class="expression" ng-model="item.send1" ng-change="saveMyModel()" />
 	</li>
 	<li>
-		Bus 2 send:
+		Bus 2 send: (%)
 		<input type="text" placeholder="Expression" class="expression" ng-model="item.send2" ng-change="saveMyModel()" />
 	</li>
 </ul>
