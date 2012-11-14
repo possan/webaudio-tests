@@ -39,15 +39,11 @@
 		Shuffle:
 		<input type="text" size="2" ng-model="dataset.shuffle" ng-change="updatePlayback()" />
 		%	
-		<hr/>
-		<section class="groups" id="groups">
-			<article ng-repeat="item in dataset.tracks" ng-include="getItemTemplate(item)"></article>
-		</section>
-		<hr/>
 		<input type="button" value="add synth" ng-click="addSynth()">
 		<input type="button" value="add sampler" ng-click="addSampler()">
 		<hr/>
-		<section class="groups" id="groups2">
+		<section class="groups" id="groups">
+			<article ng-repeat="item in dataset.tracks" ng-include="getItemTemplate(item)"></article>
 			<article ng-repeat="item in dataset.buses" ng-include="getItemTemplate(item)"></article>
 			<article ng-repeat="item in [dataset.master || {}]" ng-include="getItemTemplate(item)"></article>
 		</section>

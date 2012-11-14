@@ -92,6 +92,10 @@ Machine.prototype.stop = function() {
 	this.sequencer.stop();
 }
 
+Machine.prototype.togglePlay = function() {
+	this.sequencer.togglePlay();
+}
+
 var addDynamicValueTrack = function(target, id, input, speedy) {
 	console.log('addDynamicValueTrack', input);
 	var value = new DynamicValue(input.value || 0.0);

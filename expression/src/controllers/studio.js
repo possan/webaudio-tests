@@ -10,34 +10,6 @@ function StudioController($scope) {
 
   $scope.dummy = 'stydio12345';
 	$scope.dataset = Machine.getInstance().song.data;
-	/*
-	 {
-		bpm: 120,
-		shuffle: 30,
-		tracks: [
-			{
-				type: 'sampler',
-				title: 'Balle',
-				gate: { dynamic: true, expr: 'step % 4 == 0'},
-				sample: { dynamic: true, expr: '36 + step % 4'},
-				volume: { dynamic: false, value: 100 },
-				release: { dynamic: false, value: 80 },
-				speed: { dynamic: false, speed: 100 },
-			}, 
-			{
-				type: 'synth',
-				title: 'Balle 3',
-				note: { dynamic: true, expr: '36 + step % 4' },
-				gate: { dynamic: true, expr: 'step % 4 != 1' },
-				waveform: { dynamic: false, value: 1 },
-				vol: { dynamic: false, value: 100 },
-				release: { dynamic: false, value: 100 },
-				cutoff: { dynamic: false, value: 10000 },
-				resonance: { dynamic: false, value: 0 },
-			}
-		]
-	}; 
-	*/
 
 	if (typeof($scope.dataset.buses) === 'undefined')
 		$scope.dataset.buses = [];
@@ -60,12 +32,12 @@ function StudioController($scope) {
 		$scope._updateMutes();
 		$scope.updatePlayback();
 		console.log('play!');
-		machine.play();
+		Machine.getInstance().play();
 	}
 
 	$scope.stop = function() {
 		console.log('stop!');
-		machine.stop();
+		Machine.getInstance().stop();
 	}
 
 	$scope.updatePlayback =function() {

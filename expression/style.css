@@ -1,3 +1,8 @@
+body {
+	font: 9pt Arial;
+}
+
+
 .indicator {
 	background-color: #050;
 }
@@ -15,9 +20,19 @@ section.groups article {
 	position: relative;
 	border: 1px solid #ccc;
 	padding: 10px;
-	margin: 5px;
-	width: 200px;
+	margin: 2px;
+	width: 250px;
+	height: 400px;
 	float: left;
+}
+
+section.groups article h3 {
+	position: absolute;
+	left: 40px;
+	top: 5px;
+	width: 200px;
+	margin: 0;
+	padding: 0;
 }
 
 section.groups article .indicator {
@@ -28,17 +43,39 @@ section.groups article .indicator {
 	height: 10px;
 }
 
-section.groups article ul {
-	display: block;
-	list-style: none;
-	margin: 0;
-	padding: 0;
+section.groups article button.mutebutton {
+	position: absolute;
+	right: 40px;
+	top: 0px;
+	width: 40px;
+	height: 30px;
+	background-color: #a88;
 }
 
-section.groups article ul li {
-	display: block;
-	padding: 0;
-	margin: 0 0 10px 0;
+section.groups article button.mutebutton.down {
+	background-color: #f00;
+}
+
+section.groups article button.solobutton {
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	width: 40px;
+	height: 30px;
+	background-color: #8a8;
+}
+
+section.groups article button.solobutton.down {
+	background-color: #0f0;
+}
+
+section.groups article button.deletebutton {
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	width: 30px;
+	height: 30px;
+	background-color: #ccc;
 }
 
 section.groups article h2 {
@@ -56,10 +93,36 @@ section.groups article p {
 
 section.groups article textarea,
 section.groups article input.expression {
+	position: absolute;
+	right: 0px;
+	top: 0px;
 	width: 160px;
+	float: right;
 }
 
 hr {
 	clear: both;
 }
 
+ul.props {
+	position: absolute;
+	left: 0px;
+	top: 30px;
+	width: 250px;
+	display: block;
+	margin: 0;
+	padding: 0;
+}
+
+ul.props li {
+	position: relative;
+	width: 250px;
+	border-bottom: 1px solid #888;
+	border-top: 1px solid #ddd;
+	display: block;
+	padding: 5px;
+}
+
+ul.props li.half {
+	width: 125px;
+}
