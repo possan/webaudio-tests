@@ -1,8 +1,15 @@
-<div id="lane4indicator" class="indicator"></div>
-
-<p>Bus:</p>
-
-<ul>
-<li>Delay time: <span ng-repeat="prop in [item.delaytime]" ng-include="'prop-generic.html'"></span></li>
-<li>Delay feedback: <span ng-repeat="prop in [item.delayfeedback]" ng-include="'prop-generic.html'"></span></li>
+<header>
+	<h3>
+		Bus:
+	</h3>
+</header>
+<ul class="props">
+	<li>
+		Delay time: (%)
+		<input placeholder="Expression" class="expression" ng-model="item.delaytime" ng-change="saveMyModel()" />
+	</li>
+	<li>
+		Delay feedback: (%)
+		<input placeholder="Expression" class="expression" ng-model="item.delayfeedback" ng-change="saveMyModel()" />
+	</li>
 </ul>

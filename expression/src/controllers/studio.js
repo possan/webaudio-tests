@@ -10,34 +10,7 @@ function StudioController($scope) {
 
   $scope.dummy = 'stydio12345';
 	$scope.dataset = Machine.getInstance().song.data;
-	/*
-	 {
-		bpm: 120,
-		shuffle: 30,
-		tracks: [
-			{
-				type: 'sampler',
-				title: 'Balle',
-				gate: { dynamic: true, expr: 'step % 4 == 0'},
-				sample: { dynamic: true, expr: '36 + step % 4'},
-				volume: { dynamic: false, value: 100 },
-				release: { dynamic: false, value: 80 },
-				speed: { dynamic: false, speed: 100 },
-			}, 
-			{
-				type: 'synth',
-				title: 'Balle 3',
-				note: { dynamic: true, expr: '36 + step % 4' },
-				gate: { dynamic: true, expr: 'step % 4 != 1' },
-				waveform: { dynamic: false, value: 1 },
-				vol: { dynamic: false, value: 100 },
-				release: { dynamic: false, value: 100 },
-				cutoff: { dynamic: false, value: 10000 },
-				resonance: { dynamic: false, value: 0 },
-			}
-		]
-	}; 
-	*/
+	$scope.playing = false;
 
 	if (typeof($scope.dataset.buses) === 'undefined')
 		$scope.dataset.buses = [];
@@ -60,16 +33,19 @@ function StudioController($scope) {
 		$scope._updateMutes();
 		$scope.updatePlayback();
 		console.log('play!');
-		machine.play();
+		Machine.getInstance().play();
+		$scope.playing = Machine.getInstance().started;
 	}
 
 	$scope.stop = function() {
 		console.log('stop!');
-		machine.stop();
+		Machine.getInstance().stop();
+		$scope.playing = Machine.getInstance().started;
 	}
 
 	$scope.updatePlayback =function() {
 		$scope.saveMyModel();
+		$scope.playing = Machine.getInstance().started;
 	}
 
 	$scope.getItemTemplate = function(x) {
@@ -88,16 +64,15 @@ function StudioController($scope) {
 			title: 'New synth',
 			mute: false,
 			solo: false,
-			gate: { dynamic: false, value: 0, expr: 'step % 4 == 0'},
-			note: { dynamic: false, value: 24, expr: '36 + step % 4'},
-			volume: { dynamic: false, value: 100 },
-			cutoff: { dynamic: false, value: 10000 },
-			resonance: { dynamic: false, value: 0 },
-			release: { dynamic: false, value: 80 },
-			speed: { dynamic: false, value: 100 },
-			waveform: { dynamic: false, value: 1 },
-			send1: { dynamic: false, value: 0 },
-			send2: { dynamic: false, value: 0 },
+			gate: 'step % 4 == 0',
+			note: '36 + step % 4',
+			volume: 100,
+			cutoff: 15000,
+			resonance: 0,
+			release: 100,
+			waveform: 1,
+			send1: 0,
+			send2: 0,
 		});
 		// $scope.saveMyModel();
 	}
@@ -109,13 +84,13 @@ function StudioController($scope) {
 			title: 'New sampler',
 			mute: false,
 			solo: false,
-			gate: { dynamic: false, value: 0 },
-			sample: { dynamic: true, value: 0 },
-			volume: { dynamic: false, value: 100 },
-			release: { dynamic: false, value: 80 },
-			speed: { dynamic: false, value: 100 },
-			send1: { dynamic: false, value: 0 },
-			send2: { dynamic: false, value: 0 },
+			gate: 'step % 4 == 0',
+			sample: 0,
+			volume: 100,
+			release: 500,
+			speed: 100,
+			send1: 0,
+			send2: 0,
 	 	});
 		// $scope.saveMyModel();
 	}
@@ -144,13 +119,13 @@ function StudioController($scope) {
 	}
 
 	$scope.muteTrack = function(track) {
-		track.mute = !track.mute;
+		track.mute = !(track.mute || false);
 		$scope._updateMutes();
 		$scope.saveMyModel();
 	}
 
 	$scope.soloTrack = function(track) {
-		track.solo = !track.solo;
+		track.solo = !(track.solo || false);
 		$scope._updateMutes();
 		$scope.saveMyModel();
 	}

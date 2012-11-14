@@ -30,28 +30,50 @@
 </head>
 <body onload="bootstrap();">
 	<div ng-controller="StudioController">
-		<input type="button" value="play" ng-click="play();"/>
-		<input type="button" value="stop" ng-click="stop();"/>
-		&nbsp;
-		BPM:
-		<input type="text" size="3" ng-model="dataset.bpm" ng-change="updatePlayback()" />
-		&nbsp;
-		Shuffle:
-		<input type="text" size="2" ng-model="dataset.shuffle" ng-change="updatePlayback()" />
-		%	
-		<hr/>
+		<section class="transport">
+			<ul>
+				<li class="logo">
+					<h1>JsBeat</h1>
+					<h2>Javascript expression sequencer</h2>
+				</li>
+				<li class="buttons">
+					<input type="button" value="&#9658;" ng-click="play();"/>
+					<input type="button" value="&#9724;" ng-click="stop();"/>
+					x{{playing}}
+				</li>
+				<li class="label">
+					Title:
+					<input type="text" size="10" ng-model="dataset.title" ng-change="updatePlayback()" />
+				</li>
+				<li class="label">
+					BPM:
+					<input type="text" size="3" ng-model="dataset.bpm" ng-change="updatePlayback()" />
+				</li>
+				<li class="label">
+					Shuffle:
+					<input type="text" size="2" ng-model="dataset.shuffle" ng-change="updatePlayback()" />
+					%
+				</li>
+				<li class="buttons">
+					<input type="button" value="add synth" ng-click="addSynth()" />
+					<input type="button" value="add sampler" ng-click="addSampler()" />
+				</li>
+				<li class="buttons">
+					<input type="button" value="save" ng-click="saveWork();" />
+					<input type="button" value="fork" ng-click="forkWork();" />
+					<input type="button" value="share" ng-click="shareWork();" />
+				</li>
+			</ul>
+		</section>
 		<section class="groups" id="groups">
 			<article ng-repeat="item in dataset.tracks" ng-include="getItemTemplate(item)"></article>
+			<br/>
 		</section>
-		<hr/>
-		<input type="button" value="add synth" ng-click="addSynth()">
-		<input type="button" value="add sampler" ng-click="addSampler()">
-		<hr/>
-		<section class="groups" id="groups2">
+		<section class="groups" id="groups">
 			<article ng-repeat="item in dataset.buses" ng-include="getItemTemplate(item)"></article>
 			<article ng-repeat="item in [dataset.master || {}]" ng-include="getItemTemplate(item)"></article>
+			<br/>
 		</section>
-		<hr/>
 		<textarea id="json2" cols="100" rows="20"
 			ng-model="dataset_json"
 			ng-change="json_changed()"></textarea>

@@ -60,6 +60,13 @@ Sequencer.prototype._updateBPM = function() {
 	// console.log('time per superstep', this.timeperstep);
 }
 
+Sequencer.prototype.togglePlay = function() {
+	if (this.started)
+		this.stop();
+	else
+		this.play();
+}
+
 Sequencer.prototype.play = function() {
 	if (this.started)
 		return;
@@ -71,6 +78,8 @@ Sequencer.prototype.play = function() {
 	this.timer = setInterval(function() {
 		var t = (new Date()).getTime();
 		var dt = t - lasttick;
+		if (dt > 5000.0)
+			dt = 5000.0;
 		lasttick = t;
 		self.progress += dt;
 		self.progresstotal += dt;
@@ -82,7 +91,7 @@ Sequencer.prototype.play = function() {
 		// console.log('tps='+tps);
 		self.progress -= tps;
 		self._subtick(self.progress);
-	}, 1);
+	}, 5);
 }
 
 Sequencer.prototype.stop = function() {

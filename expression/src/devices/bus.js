@@ -37,8 +37,8 @@ BusDevice.prototype.update = function(track, state) {
 		var bps = 1 * bpm / 60.0;
 		var mspb = 1000.0 / bps;
 		var msd = track.values['delaytime'].value * mspb / 100.0;
-		console.log('mspb',mspb,'msd',msd);
-	  this.delay.delayTime.value = msd; // ms -> seconds
+	//	console.log('mspb',mspb,'msd',msd);
+	  this.delay.delayTime.value = msd / 1000.0; // ms -> seconds
 	}
 	if(track.values['delayfeedback'].updated) {
 		// console.log('delayfeedback changed', track.values['delayfeedback']);
