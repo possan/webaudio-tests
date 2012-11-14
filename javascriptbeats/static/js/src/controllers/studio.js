@@ -49,7 +49,7 @@ function StudioController($scope) {
 	}
 
 	$scope.getItemTemplate = function(x) {
-		return 'editor-'+x.type+'.html';
+		return '/static/tmpl/editor-'+x.type+'.html';
 	}
 
 	$scope.saveMyModel = function() {
