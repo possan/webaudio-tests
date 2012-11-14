@@ -34,7 +34,7 @@ BusDevice.prototype.update = function(track, state) {
 	if(track.values['delaytime'].updated) {
 		// console.log('delaytime changed', track.values['delaytime']);
 		var bpm = this.machine.sequencer.bpm;
-		var bps = 4 * bpm / 60.0;
+		var bps = 1 * bpm / 60.0;
 		var mspb = 1000.0 / bps;
 		var msd = track.values['delaytime'].value * mspb / 100.0;
 		console.log('mspb',mspb,'msd',msd);
