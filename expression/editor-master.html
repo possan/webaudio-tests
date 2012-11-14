@@ -3,9 +3,24 @@
 </h3>
 
 <ul class="props">
-<li>Bus 1 receive: <span ng-repeat="prop in [item.receive1]" ng-include="'prop-generic.html'"></span></li>
-<li>Bus 2 receive: <span ng-repeat="prop in [item.receive2]" ng-include="'prop-generic.html'"></span></li>
-<li>Compression<span ng-repeat="prop in [item.compression]" ng-include="'prop-generic.html'"></span></li>
-<li>Comp. release<span ng-repeat="prop in [item.comprelease]" ng-include="'prop-generic.html'"></span></li>
-<li>Comp. treshold<span ng-repeat="prop in [item.comptreshold]" ng-include="'prop-generic.html'"></span></li>
+	<li>
+		Bus 1 receive: (%)
+		<input placeholder="Expression" class="expression" ng-model="item.receive1" ng-change="saveMyModel()" />
+	</li>
+	<li>
+		Bus 2 receive: (%)
+		<input placeholder="Expression" class="expression" ng-model="item.receive2" ng-change="saveMyModel()" />
+	</li>
+	<li>
+		Compression: (%)	
+		<input placeholder="Expression" class="expression" ng-model="item.compression" ng-change="saveMyModel()" />
+	</li>
+	<li>
+		Comp. release:
+		<input placeholder="Expression" class="expression" ng-model="item.comprelease" ng-change="saveMyModel()" />
+	</li>
+	<li>
+		Comp. treshold:
+		<input placeholder="Expression" class="expression" ng-model="item.comptreshold" ng-change="saveMyModel()" />
+	</li>
 </ul>

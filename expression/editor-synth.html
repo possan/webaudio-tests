@@ -10,13 +10,40 @@
 </h3>
 
 <ul class="props">
-<li>Gate: <span ng-repeat="prop in [item.gate]" ng-include="'prop-generic.html'"></span></li>
-<li>Note: <span ng-repeat="prop in [item.note]" ng-include="'prop-generic.html'"></span></li>
-<li>Waveform: <span ng-repeat="prop in [item.waveform]" ng-include="'prop-generic.html'"></span></li>
-<li>Release: <span ng-repeat="prop in [item.release]" ng-include="'prop-generic.html'"></span></li>
-<li>Volume: <span ng-repeat="prop in [item.volume]" ng-include="'prop-generic.html'"></span></li>
-<li>Cutoff: <span ng-repeat="prop in [item.cutoff]" ng-include="'prop-generic.html'"></span></li>
-<li>Resonance: <span ng-repeat="prop in [item.resonance]" ng-include="'prop-generic.html'"></span></li>
-<li>Bus 1 send: <span ng-repeat="prop in [item.send1]" ng-include="'prop-generic.html'"></span></li>
-<li>Bus 2 send: <span ng-repeat="prop in [item.send2]" ng-include="'prop-generic.html'"></span></li>
+	<li>
+		Gate:
+		<input placeholder="Expression" class="expression" ng-model="item.gate" ng-change="saveMyModel()" />
+	</li>
+	<li>
+		Note:
+ 		<input placeholder="Expression" class="expression" ng-model="item.note" ng-change="saveMyModel()" />
+	</li>
+	<li>
+		Waveform:
+		<input placeholder="Expression" class="expression" ng-model="item.waveform" ng-change="saveMyModel()" />
+	</li>
+	<li>
+		Release:
+		<input placeholder="Expression" class="expression" ng-model="item.release" ng-change="saveMyModel()" />
+	</li>
+	<li>
+		Volume:
+		<input placeholder="Expression" class="expression" ng-model="item.volume" ng-change="saveMyModel()" />
+	</li>
+	<li>
+		Cutoff:
+		<input placeholder="Expression" class="expression" ng-model="item.cutoff" ng-change="saveMyModel()" />
+	</li>
+	<li>
+		Resonance:
+		<input placeholder="Expression" class="expression" ng-model="item.resonance" ng-change="saveMyModel()" />
+	</li>
+	<li>
+		Bus 1 send:
+		<input placeholder="Expression" class="expression" ng-model="item.send1" ng-change="saveMyModel()" />
+	</li>
+	<li>
+		Bus 2 send:
+		<input placeholder="Expression" class="expression" ng-model="item.send2" ng-change="saveMyModel()" />
+	</li>
 </ul>

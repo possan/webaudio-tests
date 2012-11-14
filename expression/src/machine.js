@@ -96,23 +96,20 @@ Machine.prototype.togglePlay = function() {
 	this.sequencer.togglePlay();
 }
 
-var addDynamicValueTrack = function(target, id, input, speedy) {
-	console.log('addDynamicValueTrack', input);
-	var value = new DynamicValue(input.value || 0.0);
-	value.value = input.value || 0.0;
-	if (input.dynamic && input.expression)
-		value.setExpression(input.expression);
-	target.addValue(value, id, speedy);
-}
-
 var addDynamicValueTracks = function(target, intrack) {
 	for (var i=0; i<target.device.parameters.length; i++) {
 		var p = target.device.parameters[i];
-		var input = intrack[p.id] || {};
-		var value = new DynamicValue(input.value || 0.0);
-		value.value = input.value || 0.0;
-		if (input.dynamic && input.expression)
-			value.setExpression(input.expression);
+		var input = intrack[p.id];
+		console.log(p, input);
+		if (typeof(input) === 'undefined')
+			input = '';
+		if (typeof(input) === 'object') {
+			input = input.expression;
+			intrack[p.id] = '' + input;
+		}
+		var value = new DynamicValue(0.0);
+		// value.value = 0.0;
+		value.setExpression(input);
 		target.addValue(value, p.id, p.substep);
 	}
 }
