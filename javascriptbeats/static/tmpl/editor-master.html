@@ -1,9 +1,13 @@
 <header>
 	<h3>
-		Master
+		Master: "{{item.title}}" #{{item.id}}
 	</h3>
 </header>
 <ul class="props">
+	<li>
+		Title:
+		<input placeholder="Title" class="expression" ng-model="item.title" ng-change="saveMyModel()" />
+	</li>
 	<li>
 		Bus 1 receive: (%)
 		<input placeholder="Expression" class="expression" ng-model="item.receive1" ng-change="saveMyModel()" />
@@ -13,7 +17,7 @@
 		<input placeholder="Expression" class="expression" ng-model="item.receive2" ng-change="saveMyModel()" />
 	</li>
 	<li>
-		Compression: (%)	
+		Compression: (%)
 		<input placeholder="Expression" class="expression" ng-model="item.compression" ng-change="saveMyModel()" />
 	</li>
 	<li>

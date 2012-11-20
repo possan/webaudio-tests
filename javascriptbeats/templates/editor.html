@@ -4,8 +4,25 @@
 	<meta name="viewport" content="width=device-width" />
 	<link rel="stylesheet" href="/static/css/style.css" />
 	<script>
-		window.appDocumentId = '';
-		window.appSessionId = '';
+		window.appDocumentId = '{{ document }}';
+		window.appSessionId = '{{ session }}';
+		window.appDocument = '{{ data }}';
+		window.appCanFork = '{{ can_fork }}';
+		window.appCanSave = '{{ can_save }}';
+		window.appCanCreate = '{{ can_create }}';
+	</script>
+	<script type="text/javascript">
+
+	  var _gaq = _gaq || [];
+	  _gaq.push(['_setAccount', 'UA-36439525-1']);
+	  _gaq.push(['_trackPageview']);
+
+	  (function() {
+	    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	  })();
+
 	</script>
 	<script type="text/javascript" src="/static/js/lib/buffer-loader.js"></script>
 
@@ -60,9 +77,10 @@
 					<input type="button" value="add sampler" ng-click="addSampler()" />
 				</li>
 				<li class="buttons">
-					<input type="button" value="save" ng-click="saveWork();" />
-					<input type="button" value="fork" ng-click="forkWork();" />
-					<input type="button" value="share" ng-click="shareWork();" />
+					<input type="button" value="save" ng-show="can_create" ng-click="createWork();" />
+					<input type="button" value="save" ng-show="can_save" ng-click="saveWork();" />
+					<input type="button" value="fork" ng-show="can_fork" ng-click="forkWork();" />
+					<input type="button" value="share" ng-show="can_share" ng-click="shareWork();" />
 				</li>
 			</ul>
 		</section>

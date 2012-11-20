@@ -1,0 +1,33 @@
+
+main.html tmeplate!
+<hr/>
+
+{%- if original -%}
+<a href="/{{ original }}">original={{ original }}</a><br/>
+<hr/>
+{% endif %}
+
+<h4>Edit</h4>
+
+{%- if can_create -%}
+<form action="/blob" method="post">
+<textarea rows="10" cols="100" name="data">{{ data }}</textarea><br/>
+<input type="submit" value="Create">
+</form>
+{% endif %}
+
+{%- if can_save -%}
+<form action="/blob/{{ document }}/save" method="post">
+<textarea rows="10" cols="100" name="data">{{ data }}</textarea><br/>
+<input type="submit" value="Save">
+</form>
+{% endif %}
+
+{%- if can_fork -%}
+<form action="/blob/{{ document }}/fork" method="post">
+<textarea rows="10" cols="100" name="data">{{ data }}</textarea><br/>
+<input type="hidden" name="document" value="{{ document }}" />
+<input type="submit" value="Fork">
+</form>
+{% endif %}
+

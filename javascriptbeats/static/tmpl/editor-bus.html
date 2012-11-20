@@ -1,9 +1,13 @@
 <header>
 	<h3>
-		Bus:
+		Bus: "{{item.title}}" #{{item.id}}
 	</h3>
 </header>
 <ul class="props">
+	<li>
+		Title:
+		<input placeholder="Title" class="expression" ng-model="item.title" ng-change="saveMyModel()" />
+	</li>
 	<li>
 		Delay time: (%)
 		<input placeholder="Expression" class="expression" ng-model="item.delaytime" ng-change="saveMyModel()" />

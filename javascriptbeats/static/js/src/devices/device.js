@@ -13,5 +13,8 @@ var BaseDevice = function() {
 BaseDevice.prototype.create = function(machine) {
 }
 
+BaseDevice.prototype.destroy = function() {
+}
+
 BaseDevice.prototype.update = function(track, state) {
 }

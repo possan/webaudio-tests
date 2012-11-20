@@ -1,10 +1,10 @@
 var MasterDevice = function() {
 	BaseDevice.apply(this);
-	this.parameters.push({ id:'receive1', type:'', substep: true });
-	this.parameters.push({ id:'receive2', type:'', substep: true });
-	this.parameters.push({ id:'compression', type:'', substep: true });
-	this.parameters.push({ id:'comprelease', type:'', substep: true });
-	this.parameters.push({ id:'comptreshold', type:'', substep: true });
+	this.parameters.push({ id:'receive1', type:'', substep: true, default: '50' });
+	this.parameters.push({ id:'receive2', type:'', substep: true, default: '50' });
+	this.parameters.push({ id:'compression', type:'', substep: true, default: '100' });
+	this.parameters.push({ id:'comprelease', type:'', substep: true, default: '100' });
+	this.parameters.push({ id:'comptreshold', type:'', substep: true, default: '80' });
 };
 
 MasterDevice.prototype = new BaseDevice();
@@ -30,6 +30,8 @@ MasterDevice.prototype.create = function() {
 	this.compressor.connect(this.outputpin);
 
 }
+
+MasterDevice.prototype.destroy = function() {};
 
 MasterDevice.prototype.update = function(track, state) {
 

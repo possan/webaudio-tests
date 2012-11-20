@@ -33,6 +33,8 @@ SynthDevice.prototype.create = function() {
 	this.send2Node.connect(this.machine.bus2);
 }
 
+SynthDevice.prototype.destroy = function() {};
+
 SynthDevice.prototype.update = function(track, state) {
 	if(track.values['cutoff'].updated) {
 		// console.log('cut='+track.values[2].value);

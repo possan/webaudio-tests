@@ -29,6 +29,8 @@ SamplerDevice.prototype.create = function() {
 	this.send2Node.connect(self.machine.bus2);
 }
 
+SamplerDevice.prototype.destroy = function() {};
+
 SamplerDevice.prototype.update = function(track, state) {
 	var self = this;
 	// console.log('sample track step', state);

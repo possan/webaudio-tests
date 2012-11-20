@@ -1,6 +1,6 @@
 <header>
 	<h3>
-		Synth:
+		Synth: "{{item.title}}" #{{item.id}}
 	</h3>
 	<button ng-click="muteTrack(item);" class="mutebutton down" ng-show="item.mute || false">UNMUTE</button>
 	<button ng-click="muteTrack(item);" class="mutebutton     " ng-hide="item.mute || false">MUTE</button>
@@ -9,6 +9,10 @@
 	<button ng-click="deleteTrack(item);" class="deletebutton">X</button>
 </header>
 <ul class="props">
+	<li>
+		Title:
+		<input placeholder="Title" class="expression" ng-model="item.title" ng-change="saveMyModel()" />
+	</li>
 	<li>
 		Gate: (0-1)
 		<input placeholder="Expression" class="expression" ng-model="item.gate" ng-change="saveMyModel()" />

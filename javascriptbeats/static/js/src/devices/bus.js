@@ -1,7 +1,7 @@
 var BusDevice = function() {
 	BaseDevice.apply(this);
-	this.parameters.push({ id:'delaytime', type:'', substep: true });
-	this.parameters.push({ id:'delayfeedback', type:'', substep: true });
+	this.parameters.push({ id:'delaytime', type:'', substep: true, default: '75' });
+	this.parameters.push({ id:'delayfeedback', type:'', substep: true, default: '66' });
 	/*
 	addDynamicValueTrack(t, 'delaytime', intrack.delaytime || {}, false); // volume 1
 	addDynamicValueTrack(t, 'delayfeedback', intrack.delayfeedback || {}, false); // gate 0
@@ -30,18 +30,22 @@ BusDevice.prototype.create = function() {
 	this.delayfeedback.connect(this.outputpin);
 }
 
+BusDevice.prototype.destroy = function() {};
+
 BusDevice.prototype.update = function(track, state) {
 	if(track.values['delaytime'].updated) {
 		// console.log('delaytime changed', track.values['delaytime']);
+		var dt = track.values['delaytime'].value;
 		var bpm = this.machine.sequencer.bpm;
 		var bps = 1 * bpm / 60.0;
 		var mspb = 1000.0 / bps;
-		var msd = track.values['delaytime'].value * mspb / 100.0;
-	//	console.log('mspb',mspb,'msd',msd);
+		var msd = dt * mspb / 100.0;
+		// console.log('delaytime changed, mspb',mspb,'msd',msd);
 	  this.delay.delayTime.value = msd / 1000.0; // ms -> seconds
 	}
 	if(track.values['delayfeedback'].updated) {
-		// console.log('delayfeedback changed', track.values['delayfeedback']);
-	  this.delayfeedback.gain.value = Math.min( 1.0, Math.max( 0.0, track.values['delayfeedback'].value / 100.0 ) );
+		var df = track.values['delayfeedback'].value;
+		// console.log('delayfeedback changed', df);
+	  this.delayfeedback.gain.value = Math.min( 1.0, Math.max( 0.0, df / 100.0 ) );
 	}
 }

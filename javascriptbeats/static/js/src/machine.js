@@ -9,6 +9,8 @@ Machine = function(context) {
 
 	this.devices = [];
 	this.devicemap = {};
+	this.connections = [];
+	this.connectionmap = {};
 
 	// device output busses
 	this.bus1 = context.createGainNode();
@@ -49,25 +51,6 @@ Machine.prototype.reset = function() {
 		bpm: 110.0,
 		shuffle: 25.0,
 		tracks: [
-		 	/*	{
-			type: 'sampler',
-			sample: { value: 0, dynamic: false },
-			gate: { expr: 'step % 4 == 0', dynamic: true },
-			volume: { value: 100, dynamic: false },
-			speed: { value: 100, dynamic: false },
-			release: { value: 100, dynamic: false }
-			}, */
-			{
-				type: 'synth',
-				gate: { expression: 'step % 1 == 0', dynamic: true },
-				note: { value: 0, dynamic: true, expression: '24 + step % 5' },
-				volume: { value: 100, dynamic: false },
-				speed: { value: 100, dynamic: false },
-				waveform: { value: 1, dynamic: false },
-				release: { value: 100, dynamic: false },
-				cutoff: { value: 10000, dynamic: false },
-				resonance: { value: 1, dynamic: false }
-			}
 		]
 	});
 }
@@ -108,13 +91,22 @@ var addDynamicValueTracks = function(target, intrack) {
 			intrack[p.id] = '' + input;
 		}
 		var value = new DynamicValue(0.0);
-		// value.value = 0.0;
 		value.setExpression(input);
 		target.addValue(value, p.id, p.substep);
 	}
 }
 
-Machine.prototype.createTrackDeviceWrapper = function(device, intrack) {
+var addDefaultValueTracks = function(device, track, item) {
+	for (var i=0; i<device.parameters.length; i++) {
+		var p = device.parameters[i];
+		var value = new DynamicValue(0.0);
+		item[p.id] = p.default;
+		value.setExpression(p.default);
+		target.addValue(value, p.id, p.substep);
+	}
+}
+
+Machine.prototype.createTrackDeviceWrapper = function(device, intrack, set) {
 	var t = new Track();
 	t.device = device;
 	t.device.machine = this;
@@ -126,19 +118,135 @@ Machine.prototype.createTrackDeviceWrapper = function(device, intrack) {
 	return t;
 }
 
+
+
+Machine.prototype.numDevices = function() {
+	return this.devices.length;
+}
+
+Machine.prototype.getDeviceId = function(index) {
+	if (index >= 0 && index < this.devices.length)
+		return this.devices[index];
+	return undefined;
+}
+
+Machine.prototype.getDeviceById = function(id) {
+	return this.devicemap[id];
+}
+
+Machine.prototype.addDevice = function(type) {
+	var newid = this.generateId();
+	var d = {
+		id: newid,
+		type: type,
+		title: 'New '+type
+	};
+	d._device = this.createDeviceByType(type);
+	d._device.machine = this;
+	d._device.create();
+	d._track = new Track();
+	addDefaultValueTracks(d._device, d._track, d);
+	d._track.silent = false;
+	this.devicemap[newid] = d;
+	this.devices.push(newid);
+	return newid;
+}
+
+Machine.prototype.deviceExists = function(id) {
+	return this.devices.indexOf(id) != -1;
+}
+
+Machine.prototype.removeDevice = function(id) {
+	var idx = this.devices.indexOf(id);
+	if (idx != -1)
+		this.devices.splice(idx, 1);
+	if (this.devicemap[id]) {
+		if (this.devicemap[id]._device)
+			this.devicemap[id]._device.destroy();
+		delete this.devicemap[id];
+	}
+	return true;
+}
+
+
+
+
+
+
+
+
+Machine.prototype.connectDevices = function(fromid, toid) {
+	var newid = this.generateId();
+	this.connectionmap.push({id:newid, from:fromid, to:toid, amount:'100'});
+	this.connections.push(newid);
+	return newid;
+}
+
+Machine.prototype.disconnectDevice = function(deviceid) {
+	var conns = [];
+	for (var i=0; i<this.connections.length; i++) {
+		var c = this.connectionmap[this.connections[i]];
+		if (c.from === deviceid || c.to === deviceid)
+			conns.push(c.id);
+	}
+	for (var i=0; i<conns.length; i++)
+		this.removeConnection(conns[i]);
+}
+
+Machine.prototype.removeConnection = function(id) {
+	var idx = this.connections.indexOf(id);
+	if (idx != -1)
+		this.connections.splice(idx, 1);
+	if (this.connectionmap[id])
+		delete this.connectionmap[id];
+	return true;
+}
+
+Machine.prototype.numConnections = function() {
+	return this.connections.length;
+}
+
+Machine.prototype.getConnectionId = function(index) {
+	if (index >= 0 && index < this.connections.length)
+		return this.connections[index];
+	return undefined;
+}
+
+Machine.prototype.getConnectionById = function(id) {
+	return this.connectionmap[id];
+}
+
+Machine.prototype.connectionExists = function(id) {
+	return this.connections.indexOf(id) != -1;
+}
+
+
+
+
+
+
+
+
+Machine.prototype.createDeviceByType = function(type) {
+	if (type === 'synth')
+		return new SynthDevice();
+
+	if (type === 'sampler')
+		return new SamplerDevice();
+
+	if (type === 'bus')
+		return new BusDevice();
+
+	if (type === 'master')
+		return new MasterDevice();
+
+	return undefined;
+}
+
 Machine.prototype.createDevice = function(intrack) {
-	if (intrack.type === 'synth')
-		return this.createTrackDeviceWrapper(new SynthDevice(), intrack);
-
-	if (intrack.type === 'sampler')
-		return this.createTrackDeviceWrapper(new SamplerDevice(), intrack);
-
-	if (intrack.type === 'bus')
-		return this.createTrackDeviceWrapper(new BusDevice(), intrack);
-
-	if (intrack.type === 'master')
-		return this.createTrackDeviceWrapper(new MasterDevice(), intrack);
-
+	var device = this.createDeviceByType(intrack.type);
+	if (device)
+		return this.createTrackDeviceWrapper(device, intrack, true);
 	return undefined;
 }
 
@@ -169,6 +277,6 @@ Machine.prototype.setData = function(data) {
 	if (this.mixer.bustrack2 && data.buses)
 		this.mixer.bustrack2.setData(data.buses[1] || {});
 
-	if (this.mixer.mastertrack)
+	if (this.mixer.mastertrack && data.master)
 		this.mixer.mastertrack.setData(data.master || {});
 }

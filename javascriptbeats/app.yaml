@@ -18,13 +18,17 @@ handlers:
 - url: /src
   static_dir: src
 
-- url: /(.*\.(gif|png|jpg|css|html|mp3|js))
-  static_files: \1
-  upload: (.*\.(gif|png|jpg|css|html|mp3|js))
+- url: /test\.html
+  static_files: edit2.html
+  upload: edit2\.html
 
 - url: .*
   script: main.app
 
 libraries:
+- name: jinja2
+  version: latest
+
 - name: webapp2
   version: "2.5.1"
+
