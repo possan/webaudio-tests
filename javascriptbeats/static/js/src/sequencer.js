@@ -10,6 +10,7 @@ function Sequencer() {
 	this.progress = 0;
 	this.progresstotal = 0;
 	this.tracks = [];
+	this.tickcallback = null;
 	this.mixer = null;
 }
 
@@ -30,12 +31,17 @@ Sequencer.prototype._subtick = function(d) {
 		time: this.progresstotal / 1000.0
 	};
 
+	if (this.tickcallback)
+		this.tickcallback(state);
+
 	for (var i=0; i<this.tracks.length; i++) {
 		this.tracks[i].step(state);
 	}
 
+	/*
 	if (this.mixer)
 		this.mixer.step(state);
+	*/
 
 	this.superstep += 1;
 }
@@ -74,7 +80,9 @@ Sequencer.prototype.play = function() {
 	this._updateBPM();
 	var self = this;
 	var lasttick = (new Date()).getTime();
+	this.superstep = 0;
 	this.progress = 0;
+	this.progresstotal = 0;
 	this.timer = setInterval(function() {
 		var t = (new Date()).getTime();
 		var dt = t - lasttick;

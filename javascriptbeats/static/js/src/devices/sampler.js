@@ -33,14 +33,13 @@ SamplerDevice.prototype.destroy = function() {};
 
 SamplerDevice.prototype.update = function(track, state) {
 	var self = this;
-	// console.log('sample track step', state);
-	// console.log('gate=', track.values[0].value);
-	// console.log('vol=', track.values[1].value);
-	// console.log('speed=', track.values[2].value);
-	// console.log('sample=', track.values[3].value);
-	// console.log('release=', track.values[4].value);
-	// console.log('send1=', track.values[5].value);
-	// console.log('send2=', track.values[6].value);
+
+	console.log('sample track step', state, track);
+	for (var i=0; i<track.valueids.length; i++) {
+		var id = track.valueids[i];
+		if (track.values[id].changed)
+			console.log(id+'='+track.values[id].value);
+	}
 
 	if(track.values['send1'].updated) {
 		// console.log('send1='+track.values[5].value);

@@ -38,8 +38,8 @@ Track.prototype.step = function(state) {
 		var t = this.values[id];
 		t.updated = false;
 		if (t.highspeed || (ss % this.resolution) == 0) {
-			// console.log('evaluate step, value #', i, state);
 			t.value = t.source.evalValue(state);
+			// console.log('evaluate step value', t.source.expression, t.value);
 			t.updated = true;
 		}
 	}
@@ -47,18 +47,18 @@ Track.prototype.step = function(state) {
 	if (this.callback)
 		this.callback(this, state);
 
-	if (this.device != null)
-		this.device.update(this, state);
+	// if (this.device)
+	// 	this.device.update(this, state);
 }
 
 Track.prototype.setData = function(data) {
-	console.log('track setdata', data);
+	console.log('track setdata', this, data);
 	for (var i=0; i<this.valueids.length; i++) {
 		var id = this.valueids[i];
-		console.log('id='+id);
+		// console.log('id='+id);
 		var t = this.values[id];
 		var input = data[id] || '';
-		var newvalue = input.value || 0.0;
+		// var newvalue = input.value || 0.0;
 		/*
 		t.updated = false;
 		if (newvalue != t.source.value) {
@@ -67,8 +67,8 @@ Track.prototype.setData = function(data) {
 		}
 		*/
 		// if (input.expression) {
-			console.log('expr='+input);
-			t.source.setExpression(input);
+		// console.log('expr='+input);
+		t.source.setExpression(input);
 		// }
 	}
 }
