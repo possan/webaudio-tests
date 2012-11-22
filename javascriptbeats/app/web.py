@@ -45,7 +45,7 @@ class NewDocHandler(webapp2.RequestHandler, BasePage):
         'session': sessionid,
         'document': '',
         'owner': sessionid,
-        'data': '',
+        'data': 'null',
         'original': '',
         'can_save': False,
         'can_fork': False,

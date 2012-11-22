@@ -19,32 +19,6 @@ Machine = function(context) {
 	this.connections = [];
 	this.connectionmap = {};
 
-	// device output busses
-	this.bus1 = context.createGainNode();
-	this.bus2 = context.createGainNode();
-	this.drybus = context.createGainNode();
-
-	// master receive mixers
-	this.receive1 = context.createGainNode();
-	this.receive2 = context.createGainNode();
-
-	// master track
-	this.mixer.mastertrack = this.createDevice({type:'master'});
-	this.mixer.mastertrack.device.outputpin.connect(this.context.destination);
-	this.receive1.connect(this.mixer.mastertrack.device.receive1);
-	this.receive2.connect(this.mixer.mastertrack.device.receive2);
-	this.drybus.connect(this.mixer.mastertrack.device.inputpin);
-
-	// bus 1
-	this.mixer.bustrack1 = this.createDevice({type:'bus'});
-	this.bus1.connect(this.mixer.bustrack1.device.inputpin);
-	this.mixer.bustrack1.device.outputpin.connect(this.receive1);
-
-	// bus 2
-	this.mixer.bustrack2 = this.createDevice({type:'bus'});
-	this.bus2.connect(this.mixer.bustrack2.device.inputpin);
-	this.mixer.bustrack2.device.outputpin.connect(this.receive2);
-
 	this.reset();
 	window.machine = this;
 }
@@ -60,6 +34,14 @@ Machine.prototype._tickcallback = function(state) {
 			// console.log('track', id);
 			this.trackmap[id].step(state);
 			this.devicemap[id].update(this.trackmap[id], state);
+		}
+	}
+
+	for (var i=0; i<this.connections.length; i++) {
+		var id = this.connections[i];
+		if (this.connectionmap[id]) {
+			this.connectionmap[id].step(state);
+			// this.devicemap[id].update(this.trackmap[id], state);
 		}
 	}
 
@@ -136,13 +118,49 @@ Machine.prototype.createTrackDeviceWrapper = function(device, intrack, set) {
 	t.device.create();
 	addDynamicValueTracks(t, intrack);
 	t.silent = intrack.silent || false;
-	if (t.device.createCallback)
-		t.callback = t.device.createCallback();
 	return t;
 }
 
 
 
+Machine.prototype.getData = function() {
+	var m = this;
+	var newdata = {
+		bpm: m.sequencer.bpm,
+		shuffle: m.sequencer.shuffle,
+		title: m.song.title,
+		tracks: [],
+		connections: []
+	};
+	for (var i=0; i<m.numConnections(); i++) {
+		var id = m.getConnectionId(i);
+		var conn = m.getConnectionById(id);
+		var newconn = {};
+		newconn.id = conn.id;
+		newconn.from = conn.from;
+		newconn.to = conn.to;
+		newconn.amount = conn.values['amount'].source.expression;
+		newdata.connections.push(newconn);
+	}
+	for (var i=0; i<m.numTracks(); i++) {
+		var id = m.getTrackId(i);
+		var trk = m.getTrackById(id);
+		var newtrk = {};
+		newtrk.id = trk.id;
+		newtrk.type = trk.type;
+		newtrk.title = trk.title;
+		newtrk.solo = trk.solo;
+		newtrk.mute = trk.mute;
+		newtrk.silent = trk.silent;
+		for (var j=0; j<trk.valueids.length; j++) {
+			var id2 = trk.valueids[j];
+			newtrk[id2] = trk.values[id2].source.expression;
+		}
+		newdata.tracks.push(newtrk);
+	}
+	console.log(newdata);
+	return newdata;
+}
 
 
 
@@ -162,6 +180,24 @@ Machine.prototype.getDeviceById = function(id) {
 
 Machine.prototype.addDevice = function(type) {
 	var newid = this.generateId();
+	var newdevice = this.createDeviceByType(type);
+	if (newdevice) {
+		newdevice.id = newid;
+		newdevice.machine = this;
+		newdevice.create();
+		var newtrack = new Track();
+		newtrack.id = newid;
+		newtrack.type = type;
+		newtrack.silent = false;
+		addDefaultValueTracks(newdevice, newtrack, undefined);
+		this.devices.push(newid);
+		this.devicemap[newid] = newdevice;
+		this.tracks.push(newid);
+		this.trackmap[newid] = newtrack;
+		console.log('created ', newdevice, newtrack);
+	}
+
+	/*
 	var d = {
 		id: newid,
 		type: type,
@@ -175,6 +211,7 @@ Machine.prototype.addDevice = function(type) {
 	d._track.silent = false;
 	this.devicemap[newid] = d;
 	this.devices.push(newid);
+	*/
 	return newid;
 }
 
@@ -205,7 +242,15 @@ Machine.prototype.removeDevice = function(id) {
 
 Machine.prototype.connectDevices = function(fromid, toid) {
 	var newid = this.generateId();
-	this.connectionmap.push({id:newid, from:fromid, to:toid, amount:'100'});
+	var conn = new Connection();
+	conn.id = newid;
+	conn.machine = this;
+	conn.setData({
+		from: fromid,
+		to: toid,
+		volume: '100'
+	});
+	this.connectionmap[newid] = conn;
 	this.connections.push(newid);
 	return newid;
 }
@@ -317,6 +362,7 @@ Machine.prototype.createDevice = function(intrack) {
 Machine.prototype.setData = function(data) {
 
 	this.song.data = data;
+	this.song.title = data.title;
 	this.sequencer.setBPM(data.bpm);
 	this.sequencer.setShuffle(data.shuffle);
 
@@ -324,19 +370,22 @@ Machine.prototype.setData = function(data) {
 	var datatrackids = [];
 	var dataconnections = {};
 	var dataconnectionids = [];
-	for (var i=0; i<data.tracks.length; i++) {
-		if (data.tracks[i]) {
-			datatrackids.push(data.tracks[i].id);
-			datatracks[data.tracks[i].id] = data.tracks[i];
+	if (data.tracks) {
+		for (var i=0; i<data.tracks.length; i++) {
+			if (data.tracks[i]) {
+				datatrackids.push(data.tracks[i].id);
+				datatracks[data.tracks[i].id] = data.tracks[i];
+			}
 		}
 	}
-	if (data.connections)
+	if (data.connections) {
 		for (var i=0; i<data.connections.length; i++) {
 			if (data.connections[i]) {
 				dataconnectionids.push(data.connections[i].id);
 				dataconnections[data.connections[i].id] = data.connections[i];
 			}
 		}
+	}
 
 	// disconnect everything?!
 
@@ -348,10 +397,11 @@ Machine.prototype.setData = function(data) {
 	// kolla om vi behöver ta bort connections?
 	for (var i=0; i<this.numConnections(); i++) {
 		var id = this.getConnectionId(i);
-		if (dataconnections.indexOf(id) == -1 ) {
+		if (dataconnectionids.indexOf(id) == -1 ) {
 			console.log('remove connection', id);
 			// previously created track not in new list of tracks...
-			removeconnections.push(id);
+			this.removeConnection(id);
+			// removeconnections.push(id);
 		}
 	}
 	// kolla om vi behöver deleta tracks+devices?
@@ -360,10 +410,16 @@ Machine.prototype.setData = function(data) {
 		if (datatrackids.indexOf(id) == -1 ) {
 			console.log('remove track', id);
 			// previously created track not in new list of tracks...
-			var oldtrack = this.getTrack(id);
+			var oldtrack = this.getTrackById(id);
 			if (oldtrack)
 				oldtrack.release();
-			removetracks.push(id);
+			var olddevice = this.getDeviceById(id)
+			if (olddevice)
+				oldtrack.release();
+			// removetracks.push(id);
+			this.disconnectDevice(id);
+			this.removeDevice(id);
+			this.removeTrack(id);
 		}
 	}
 	// adda nya devices och tracks
@@ -381,6 +437,7 @@ Machine.prototype.setData = function(data) {
 				newdevice.create();
 				var newtrack = new Track();
 				newtrack.id = id;
+				newtrack.type = intrack.type;
 				newtrack.silent = false;
 				addDefaultValueTracks(newdevice, newtrack, undefined);
 				this.devices.push(id);
@@ -394,8 +451,13 @@ Machine.prototype.setData = function(data) {
 	// adda nya connections
 	for (var i=0; i<dataconnectionids.length; i++) {
 		var id = dataconnectionids[i];
+		console.log('ensure connection', id);
 		if (!this.connectionExists(id)) {
-			newconnections.push(dataconnections[id]);
+			this.connections.push(id);
+			var c = new Connection();
+			c.id = id;
+			c.machine = this;
+			this.connectionmap[id] = c;
 		}
 	}
 
@@ -403,39 +465,17 @@ Machine.prototype.setData = function(data) {
 	for (var i=0; i<datatrackids.length; i++) {
 		var id = datatrackids[i];
 		var track = this.getTrackById(id);
-		console.log('get track', id, track);
+		// console.log('get track', id, track);
 		if (track)
 			track.setData(datatracks[id]);
 	}
 
-	// sätt alla deviceparametrar
-
-	// sätt alla connectionparametrar
-
-	// all done.
-	/*
-	for (var i=0; i<this.sequencer.tracks.length; i++) {
-		this.sequencer.tracks[i].release();
+	// uppdatera alla connections med nya expressions!
+	for (var i=0; i<dataconnectionids.length; i++) {
+		var id = dataconnectionids[i];
+		var conn = this.getConnectionById(id);
+		// console.log('get track', id, track);
+		if (conn)
+			conn.setData(dataconnections[id]);
 	}
-
-	this.sequencer.tracks = [];
-
-	if (data.tracks) {
-		for (var i=0; i<data.tracks.length; i++) {
-			console.log('migrate track #'+i, data.tracks[i]);
-			var intrack = data.tracks[i] || {};
-			var t = this.createDevice(intrack);
-			// this.sequencer.tracks.push(t);
-		}
-	}
-*/
-	if (this.mixer.bustrack1 && data.buses)
-		this.mixer.bustrack1.setData(data.buses[0] || {});
-
-	if (this.mixer.bustrack2 && data.buses)
-		this.mixer.bustrack2.setData(data.buses[1] || {});
-
-	if (this.mixer.mastertrack && data.master)
-		this.mixer.mastertrack.setData(data.master || {});
-	
 }

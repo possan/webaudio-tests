@@ -1,6 +1,7 @@
 
 
 function Song() {
+	this.title = '';
 	this.data = {
 		tracks: [],
 		meta: {

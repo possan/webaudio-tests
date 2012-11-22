@@ -11,34 +11,26 @@
 <ul class="props">
 	<li>
 		Title:
-		<input placeholder="Title" class="expression" ng-model="item.title" ng-change="saveMyModel()" />
+		<input placeholder="Title" class="expression" ng-model="item.title" ng-change="updateDevice(item)" />
 	</li>
 	<li>
 		Gate: (0-1)
-		<input type="text" placeholder="Expression" class="expression" ng-model="item.gate" ng-change="saveMyModel()" />
+		<input type="text" placeholder="Expression" class="expression" ng-model="item.gate" ng-change="updateDevice(item)" />
 	</li>
 	<li>
 		Speed: (%)
-		<input type="text" placeholder="Expression" class="expression" ng-model="item.speed" ng-change="saveMyModel()" />
+		<input type="text" placeholder="Expression" class="expression" ng-model="item.speed" ng-change="updateDevice(item)" />
 	</li>
 	<li>
 		Sample: (n)
-		<input type="text" placeholder="Expression" class="expression" ng-model="item.sample" ng-change="saveMyModel()" />
+		<input type="text" placeholder="Expression" class="expression" ng-model="item.sample" ng-change="updateDevice(item)" />
 	</li>
 	<li>
 		Release: (ms)
-		<input type="text" placeholder="Expression" class="expression" ng-model="item.release" ng-change="saveMyModel()" />
+		<input type="text" placeholder="Expression" class="expression" ng-model="item.release" ng-change="updateDevice(item)" />
 	</li>
 	<li>
 		Volume: (%)
-		<input type="text" placeholder="Expression" class="expression" ng-model="item.volume" ng-change="saveMyModel()" />
-	</li>
-	<li>
-		Bus 1 send: (%)
-		<input type="text" placeholder="Expression" class="expression" ng-model="item.send1" ng-change="saveMyModel()" />
-	</li>
-	<li>
-		Bus 2 send: (%)
-		<input type="text" placeholder="Expression" class="expression" ng-model="item.send2" ng-change="saveMyModel()" />
+		<input type="text" placeholder="Expression" class="expression" ng-model="item.volume" ng-change="updateDevice(item)" />
 	</li>
 </ul>

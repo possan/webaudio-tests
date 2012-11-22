@@ -3,6 +3,7 @@
 function DynamicValue(defaultvalue, interval) {
 	this.value = defaultvalue;
 	this.expression = '';
+	this.lastexpression = '<INVALID>';
 	this.fun = null;
 	this.interval = interval;
 }
@@ -17,11 +18,12 @@ DynamicValue.prototype.getFixedValue = function() {
 }
 
 DynamicValue.prototype.setExpression = function(expr) {
-	this.fun = null;
 	this.expression = (expr || '').trim();
-	console.log('Trying to compile: '+this.expression);
-	if (this.expression === '')
-		return;
+	if (this.expression == this.lastexpression) return;
+	// console.log('Trying to compile: '+this.expression);
+	this.fun = null;
+	this.lastexpression = this.expression;
+	if (this.expression == '') return;
 	try {
 		var c = 'return (' + this.expression + ');';
 		var f = new Function(['step', 'substep', 'superstep', 'time'], c);

@@ -1,0 +1,7 @@
+connect from <input placeholder="From" size="7" class="expression" ng-model="item.from" ng-change="updateConnection(item)" />
+with volume
+<input placeholder="Amount" size="3" class="expression" ng-model="item.amount" ng-change="updateConnection(item)" />
+ to
+<input placeholder="To" size="7" class="expression" ng-model="item.to" ng-change="updateConnection(item)" />%
+&nbsp;
+<button ng-click="deleteConnection(item);" class="deletebutton">delete {{item.id}}</button>

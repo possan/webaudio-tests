@@ -4,12 +4,15 @@
 	<meta name="viewport" content="width=device-width" />
 	<link rel="stylesheet" href="/static/css/style.css" />
 	<script>
-		window.appDocumentId = '{{ document }}';
 		window.appSessionId = '{{ session }}';
-		window.appDocument = '{{ data }}';
 		window.appCanFork = '{{ can_fork }}';
 		window.appCanSave = '{{ can_save }}';
 		window.appCanCreate = '{{ can_create }}';
+		window.appDocumentId = '{{ document }}';
+		try {
+			window.appDocument = {{ data }};
+		} catch(e) {
+		}
 	</script>
 	<script type="text/javascript">
 
@@ -38,6 +41,8 @@
 	<script type="text/javascript" src="/static/js/src/devices/master.js"></script>
 	<script type="text/javascript" src="/static/js/src/devices/bus.js"></script>
 
+	<script type="text/javascript" src="/static/js/src/basetrack.js"></script>
+	<script type="text/javascript" src="/static/js/src/connection.js"></script>
 	<script type="text/javascript" src="/static/js/src/track.js"></script>
 	<script type="text/javascript" src="/static/js/src/machine.js"></script>
 
@@ -52,8 +57,8 @@
 		<section class="transport">
 			<ul>
 				<li class="logo">
-					<h1>JsBeat</h1>
-					<h2>Javascript expression sequencer</h2>
+					<h1>Javascript Beats</h1>
+					<h2>expression synth + sequencer</h2>
 				</li>
 				<li class="buttons">
 					<input type="button" value="&#9658;" ng-click="play();"/>
@@ -61,20 +66,16 @@
 				</li>
 				<li class="label">
 					Title:
-					<input type="text" size="10" ng-model="dataset.title" ng-change="updatePlayback()" />
+					<input type="text" size="10" ng-model="dataset.title" ng-change="saveMeta()" />
 				</li>
 				<li class="label">
 					BPM:
-					<input type="text" size="3" ng-model="dataset.bpm" ng-change="updatePlayback()" />
+					<input type="text" size="3" ng-model="dataset.bpm" ng-change="saveMeta()" />
 				</li>
 				<li class="label">
 					Shuffle:
-					<input type="text" size="2" ng-model="dataset.shuffle" ng-change="updatePlayback()" />
+					<input type="text" size="2" ng-model="dataset.shuffle" ng-change="saveMeta()" />
 					%
-				</li>
-				<li class="buttons">
-					<input type="button" value="add synth" ng-click="addSynth()" />
-					<input type="button" value="add sampler" ng-click="addSampler()" />
 				</li>
 				<li class="buttons">
 					<input type="button" value="save" ng-show="can_create" ng-click="createWork();" />
@@ -84,15 +85,28 @@
 				</li>
 			</ul>
 		</section>
+<hr/>
 		<section class="groups" id="groups">
 			<article ng-repeat="item in dataset.tracks" ng-include="getItemTemplate(item)"></article>
 			<br/>
 		</section>
-		<section class="groups" id="groups">
-			<article ng-repeat="item in dataset.buses" ng-include="getItemTemplate(item)"></article>
-			<article ng-repeat="item in [dataset.master || {}]" ng-include="getItemTemplate(item)"></article>
+		<br/>
+		<button ng-click="addDevice('synth');">add synth</button>
+		<button ng-click="addDevice('sampler');">add sampler</button>
+		&nbsp;
+		<button ng-click="addDevice('delay');">add delay</button>
+		<button ng-click="addDevice('reverb');">add reverb</button>
+		&nbsp;
+		<button ng-click="addDevice('bus');">add bus</button>
+		<button ng-click="addDevice('master');">add master</button>
+<hr/>
+		<section class="connections" id="connections">
+			<article ng-repeat="item in dataset.connections" ng-include="getConnectionTemplate(item)"></article>
 			<br/>
 		</section>
+		<br/>
+		<button ng-click="addConnection();">add connection</button>
+<hr/>
 		<textarea id="json2" cols="100" rows="20"
 			ng-model="dataset_json"
 			ng-change="json_changed()"></textarea>

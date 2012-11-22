@@ -1667,8 +1667,147 @@
 
 
 
+[12,3,48,26][(step>>0)%4]+[3,3,2,1,0,0,12,0][(step>>3)%8]
 
 
 
+
+
+
+
+
+
+
+
+
+
+  var doc =       {
+      "title": "My awesome low-fi track",
+      "bpm": "120",
+      "shuffle": "33",
+      "tracks": [
+        {
+          "id": "device1",
+          "type": "synth",
+          "title": "Bass",
+          "gate": "1",
+          "note": "[12,24][(step>>1)%2]+[3,3,2,1,0,0,12,0][(step>>3)%8]",
+          "volume": "50",
+          "speed": 100,
+          "waveform": "1",
+          "release": "150",
+          "cutoff": "900 + 300 * Math.sin(time*5)",
+          "resonance": "2",
+          "send1": "100",
+          "send2": "100",
+          "silent": false,
+          "solo": false,
+          "mute": false
+        },
+        {
+          "id": "device2",
+          "title": "Snare",
+          "type": "sampler",
+          "gate": "(step%8==4)||(step%16==14)",
+          "sample": "3",
+          "volume": "100",
+          "release": "200",
+          "speed": "100",
+          "send1": "100",
+          "send2": "100",
+          "silent": false,
+          "solo": false,
+          "mute": false
+        },
+        {
+          "type": "sampler",
+          "id": "device3",
+          "title": "Kickdrum",
+          "gate": "step % 4 == 0",
+          "sample": "4",
+          "volume": "300",
+          "release": "100",
+          "speed": "100",
+          "send1": "0",
+          "send2": "10",
+          "silent": false,
+          "mute": false,
+          "solo": false
+        },
+        {
+          "type": "sampler",
+         "id": "device4",
+         "title": "Kickdrum 2",
+          "gate": "step % 4 == 0",
+          "sample": "0",
+          "volume": "200",
+          "release": "500",
+          "speed": "130",
+          "send1": "0",
+          "send2": "10",
+          "silent": false,
+          "mute": false,
+          "solo": false
+        },
+        {
+          "id": "device5",
+          "type": "sampler",
+          "title": "New sampler",
+          "mute": false,
+          "solo": false,
+          "gate": "1",
+          "sample": "2",
+          "volume": "100",
+          "release": "20",
+          "speed": "250-(20*(step%4))",
+          "send1": "30",
+          "send2": "100",
+          "silent": false
+        },
+        {
+          "id": "bus1",
+          "title": "Bus 1",
+          "type": "bus",
+          "delaytime": "0.1",
+          "delayfeedback": "77"
+        },
+        {
+          "id": "bus2",
+          "title": "Bus 2",
+          "type": "bus",
+          "delaytime": "75",
+          "delayfeedback": "40 + 30*Math.sin(time)"
+        },
+        {
+          "id": "master",
+          "title": "Master",
+          "type": "master",
+          "receive1": "100",
+          "receive2": "33"
+        }
+      ],
+      "connections": [
+        { id: "_00", from: 'device1', to: 'bus1', amount: '100' },
+        { id: "_01", from: 'device1', to: 'bus2', amount: '100' },
+        { id: "_02", from: 'device1', to: 'master', amount: '100' },
+        { id: "_03", from: 'device2', to: 'bus1', amount: '100' },
+        { id: "_04", from: 'device2', to: 'bus2', amount: '100' },
+        { id: "_05", from: 'device2', to: 'master', amount: '100' },
+        { id: "_06", from: 'device3', to: 'bus1', amount: '100' },
+        { id: "_07", from: 'device3', to: 'bus2', amount: '100' },
+        { id: "_08", from: 'device3', to: 'master', amount: '100' },
+        { id: "_09", from: 'device4', to: 'bus1', amount: '100' },
+        { id: "_10", from: 'device4', to: 'bus2', amount: '100' },
+        { id: "_11", from: 'device4', to: 'master', amount: '100' },
+        { id: "_12", from: 'device5', to: 'bus1', amount: '100' },
+        { id: "_13", from: 'device5', to: 'bus2', amount: '100' },
+        { id: "_14", from: 'device5', to: 'master', amount: '100' },
+        { id: "_15", from: 'device6', to: 'bus1', amount: '100' },
+        { id: "_16", from: 'device6', to: 'bus2', amount: '100' },
+        { id: "_17", from: 'device6', to: 'master', amount: '100' },
+        { id: "_18", from: 'bus1', to: 'master', amount: '100' },
+        { id: "_19", from: 'bus2', to: 'master', amount: '100' }
+      ]
+    };
 
 

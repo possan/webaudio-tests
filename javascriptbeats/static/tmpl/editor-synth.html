@@ -11,42 +11,34 @@
 <ul class="props">
 	<li>
 		Title:
-		<input placeholder="Title" class="expression" ng-model="item.title" ng-change="saveMyModel()" />
+		<input placeholder="Title" class="expression" ng-model="item.title" ng-change="updateDevice(item)" />
 	</li>
 	<li>
 		Gate: (0-1)
-		<input placeholder="Expression" class="expression" ng-model="item.gate" ng-change="saveMyModel()" />
+		<input placeholder="Expression" class="expression" ng-model="item.gate" ng-change="updateDevice(item)" />
 	</li>
 	<li>
 		Note: (key)
- 		<input placeholder="Expression" class="expression" ng-model="item.note" ng-change="saveMyModel()" />
+ 		<input placeholder="Expression" class="expression" ng-model="item.note" ng-change="updateDevice(item)" />
 	</li>
 	<li>
 		Waveform: (0-4)
-		<input placeholder="Expression" class="expression" ng-model="item.waveform" ng-change="saveMyModel()" />
+		<input placeholder="Expression" class="expression" ng-model="item.waveform" ng-change="updateDevice(item)" />
 	</li>
 	<li>
 		Release: (ms)
-		<input placeholder="Expression" class="expression" ng-model="item.release" ng-change="saveMyModel()" />
+		<input placeholder="Expression" class="expression" ng-model="item.release" ng-change="updateDevice(item)" />
 	</li>
 	<li>
 		Volume: (%)
-		<input placeholder="Expression" class="expression" ng-model="item.volume" ng-change="saveMyModel()" />
+		<input placeholder="Expression" class="expression" ng-model="item.volume" ng-change="updateDevice(item)" />
 	</li>
 	<li>
 		Cutoff: (hz)
-		<input placeholder="Expression" class="expression" ng-model="item.cutoff" ng-change="saveMyModel()" />
+		<input placeholder="Expression" class="expression" ng-model="item.cutoff" ng-change="updateDevice(item)" />
 	</li>
 	<li>
 		Resonance: (%)
-		<input placeholder="Expression" class="expression" ng-model="item.resonance" ng-change="saveMyModel()" />
-	</li>
-	<li>
-		Bus 1 send: (%)
-		<input placeholder="Expression" class="expression" ng-model="item.send1" ng-change="saveMyModel()" />
-	</li>
-	<li>
-		Bus 2 send: (%)
-		<input placeholder="Expression" class="expression" ng-model="item.send2" ng-change="saveMyModel()" />
+		<input placeholder="Expression" class="expression" ng-model="item.resonance" ng-change="updateDevice(item)" />
 	</li>
 </ul>
