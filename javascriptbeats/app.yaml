@@ -22,6 +22,10 @@ handlers:
   static_files: edit2.html
   upload: edit2\.html
 
+- url: /edit3\.html
+  static_files: edit3.html
+  upload: edit3\.html
+
 - url: .*
   script: main.app
 

@@ -1,0 +1,92 @@
+html {
+	height: 100%;
+}
+
+body {
+	height: 100%;
+	padding: 0;
+	margin: 0;
+}
+
+.workspace {
+	position: relative;
+	border: 1px solid #f0f;
+	padding: 0;
+	margin: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.workspace canvas {
+	left: 0px;
+	top: 0px;
+	width: 100%;
+	height: 100%;
+}
+
+ul.blocks {
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	list-style: none;
+	border: 1px solid #444;
+	padding: 10px;
+	margin: 0;
+}
+
+ul.blocks li {
+	position: absolute;
+	border: 1px solid #444;
+	padding: 0px;
+	margin: 0;
+	width: 50px;
+	height: 50px;
+	background-color: #eee;
+	cursor: pointer;
+}
+
+ul.blocks li.dragging {
+	background-color: #666;
+	-webkit-transform: scale(1.25);
+	opacity: 0.66;
+	z-index: 99;
+}
+
+ul.blocks li.selected {
+	background-color: #66f;
+}
+
+ul.connections {
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	list-style: none;
+	border: 1px solid #444;
+	padding: 0px;
+	margin: 0;
+}
+
+ul.connections li {
+	position: absolute;
+	border: 1px solid #444;
+	padding: 0px;
+	margin: 0;
+	width: 24px;
+	height: 24px;
+	background-color: #eee;
+	cursor: pointer;
+}
+
+ul.connections li.selected {
+	background-color: #cf8;
+}
+
+.sidebar {
+	position: absolute;
+	top: 0px;
+	right: 	0px;
+	width: 250px;
+	height: 100%;
+	background-color: #aaa;
+	border-left: 1px solid #666;
+}

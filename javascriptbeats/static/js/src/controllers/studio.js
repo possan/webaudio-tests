@@ -402,5 +402,174 @@ function StudioController($scope, $http) {
 };
 
 module.controller('StudioController', StudioController);
-console.log('after app.js');
 
+
+function BuzzController($scope, $http) {
+	console.log('create buzz');
+
+	$scope.blocks = [
+		{
+			id: 'block1',
+			index: 0,
+			title: 'Block 1',
+			x: 100,
+			y: 50
+		},
+		{
+			id: 'block2',
+			index: 1,
+			title: 'Block 2',
+			x: 200,
+			y: 100
+		},
+		{
+			id: 'block3',
+			index: 2,
+			title: 'Block 3',
+			x: 180,
+			y: 250
+		}
+	];
+
+	$scope.getBlockPosition = function(block) {
+		return {
+			left: (block.x-25) + 'px',
+			top: (block.y-25) + 'px'
+		}
+	}
+
+	$scope.getConnectionPosition = function(conn) {
+		return {
+			left: (conn.x-12) + 'px',
+			top: (conn.y-12) + 'px'
+		}
+	}
+
+	var _hidelines = function() {
+		$('.workspace canvas').hide();
+		$('.workspace .connections').hide();
+	}
+
+	var _showlines = function() {
+		$('.workspace canvas').show();
+		$('.workspace .connections').show();
+	}
+
+	$scope.connections = [
+		{id: 'ca', index: 0, from:'block1', to:'block2'},
+		{id: 'cb', index: 1, from:'block2', to:'block3'},
+	];
+
+	$scope.props = [
+	];
+
+	$scope.title = 'Buxx?';
+
+	var _scope = $scope;
+
+	var _findblock = function(id) {
+		for (var i=0; i<_scope.blocks.length; i++)
+			if (_scope.blocks[i].id == id)
+				return _scope.blocks[i];
+		return undefined;
+	}
+
+	var _renderconnections = function() {
+		console.log('render connections');
+		var ws = $('.workspace');
+		var canvas = $('#arrows')[0];
+		canvas.width = ws.width();
+		canvas.height = ws.height();
+		console.log(canvas.width, canvas.height);
+		var ctx = canvas.getContext('2d');
+		ctx.fillColor = '#ddd';
+		ctx.fillRect(0, 0, ctx.width, ctx.height);
+		for (var i=0; i<_scope.connections.length; i++) {
+			var c = _scope.connections[i];
+			console.log('draw connection', c);
+			var a = _findblock(c.from);
+			var b = _findblock(c.to);
+			console.log('from', a);
+			console.log('to', b);
+			ctx.strokeColor = '#ff0000';
+			ctx.moveTo(a.x, a.y);
+			ctx.lineTo(b.x, b.y);
+			ctx.stroke();
+			c.x = (a.x + b.x) / 2;
+			c.y = (a.y + b.y) / 2;
+		}
+		$scope.$apply();
+	}
+
+	$scope.selected = '';
+
+	setTimeout(function() {
+   	_renderconnections();
+   	$( '.workspace' ).click(function(b) {
+   		console.log('clicked workspace');
+	   	$( 'ul.blocks li' ).removeClass('selected');
+	   	$( 'ul.connections li' ).removeClass('selected');
+    	$scope.selected = '';
+   		$scope.$apply();
+   	});
+   	$( 'ul.blocks li' ).click(function(event) {
+ 	   	event.stopPropagation();
+			if (!$(this).hasClass('dragging')) {
+		   	event.preventDefault();
+     		console.log('clicked block 2', this);
+     		if ($scope.selected != this.dataset.id) {
+			   	$( 'ul.blocks li' ).removeClass('selected');
+			   	$( 'ul.connections li' ).removeClass('selected');
+		   		$(this).addClass('selected');
+		    	$scope.selected = this.dataset.id;
+     		} else {
+		   		$(this).removeClass('selected');
+		   		$scope.selected = '';
+     		}
+     		$scope.$apply();
+		  }
+   	});
+   	$( 'ul.connections li' ).click(function(event) {
+	   	event.preventDefault();
+	   	event.stopPropagation();
+   		console.log('clicked connection 2', this);
+   		if ($scope.selected != this.dataset.id) {
+		   	$( 'ul.blocks li' ).removeClass('selected');
+		   	$( 'ul.connections li' ).removeClass('selected');
+		   	$(this).addClass('selected');
+	    	$scope.selected = this.dataset.id;
+	    } else {
+     		$(this).removeClass('selected');
+	   		$scope.selected = '';
+     	}
+   		 _scope.$apply();
+   	});
+		$( "ul.blocks li" ).draggable({
+      start: function() {
+      	// hide canvas
+        $(this).addClass('dragging');
+      	console.log('start drag', this);
+      	_hidelines();
+      },
+      stop: function() {
+      	// save position
+      	// redraw canvas
+		   	$(this).removeClass('dragging');
+      	var idx = parseInt(this.dataset.index);
+      	var x = parseFloat(this.style.left);
+      	var y = parseFloat(this.style.top);
+      	console.log('stop drag' ,this);
+      	console.log('idx:' ,idx);
+      	console.log('data:',this.dataset);
+      	console.log('x:',x);
+      	console.log('y:',y);
+      	_scope.blocks[idx].x = x+25;
+      	_scope.blocks[idx].y = y+25;
+      	_renderconnections();
+      	_showlines();
+      }
+    });
+	}, 100);
+};
+
+module.controller('BuzzController', BuzzController);
