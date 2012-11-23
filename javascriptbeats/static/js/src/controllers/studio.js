@@ -13,15 +13,13 @@ function StudioController($scope, $http) {
 	};
 	// Machine.getInstance().song.data;
 	$scope.playing = false;
+	$scope.state = '';
 
 	$scope.id = window.appDocumentId;
 	$scope.can_share = false;
 	$scope.can_save = window.appCanSave;
 	$scope.can_fork = window.appCanFork;
 	$scope.can_create = window.appCanCreate;
-
-
-
 
 	machine.sampler.load([
 		{ url: '/static/audio/808kick3.mp3', name: '808 Kick' },
@@ -405,8 +403,11 @@ module.controller('StudioController', StudioController);
 
 
 function BuzzController($scope, $http) {
-	console.log('create buzz');
 
+	$scope.state = '';
+	$scope.props = [];
+	$scope.title = 'Buxx?';
+	$scope.selected = '';
 	$scope.blocks = [
 		{
 			id: 'block1',
@@ -428,90 +429,32 @@ function BuzzController($scope, $http) {
 			title: 'Block 3',
 			x: 180,
 			y: 250
+		},
+		{
+			id: 'block4',
+			index: 3,
+			title: 'Block 4',
+			x: 110,
+			y: 250
+		},
+		{
+			id: 'bloc5k',
+			index: 4,
+			title: 'Block 5',
+			x: 130,
+			y: 300
 		}
 	];
-
-	$scope.getBlockPosition = function(block) {
-		return {
-			left: (block.x-25) + 'px',
-			top: (block.y-25) + 'px'
-		}
-	}
-
-	$scope.getConnectionPosition = function(conn) {
-		return {
-			left: (conn.x-12) + 'px',
-			top: (conn.y-12) + 'px'
-		}
-	}
-
-	var _hidelines = function() {
-		$('.workspace canvas').hide();
-		$('.workspace .connections').hide();
-	}
-
-	var _showlines = function() {
-		$('.workspace canvas').show();
-		$('.workspace .connections').show();
-	}
 
 	$scope.connections = [
 		{id: 'ca', index: 0, from:'block1', to:'block2'},
 		{id: 'cb', index: 1, from:'block2', to:'block3'},
 	];
 
-	$scope.props = [
-	];
+	var _makeDraggable = function() {
+   	$( 'ul.blocks li' ).unbind('click');
+		$( 'ul.connections li' ).unbind('click');
 
-	$scope.title = 'Buxx?';
-
-	var _scope = $scope;
-
-	var _findblock = function(id) {
-		for (var i=0; i<_scope.blocks.length; i++)
-			if (_scope.blocks[i].id == id)
-				return _scope.blocks[i];
-		return undefined;
-	}
-
-	var _renderconnections = function() {
-		console.log('render connections');
-		var ws = $('.workspace');
-		var canvas = $('#arrows')[0];
-		canvas.width = ws.width();
-		canvas.height = ws.height();
-		console.log(canvas.width, canvas.height);
-		var ctx = canvas.getContext('2d');
-		ctx.fillColor = '#ddd';
-		ctx.fillRect(0, 0, ctx.width, ctx.height);
-		for (var i=0; i<_scope.connections.length; i++) {
-			var c = _scope.connections[i];
-			console.log('draw connection', c);
-			var a = _findblock(c.from);
-			var b = _findblock(c.to);
-			console.log('from', a);
-			console.log('to', b);
-			ctx.strokeColor = '#ff0000';
-			ctx.moveTo(a.x, a.y);
-			ctx.lineTo(b.x, b.y);
-			ctx.stroke();
-			c.x = (a.x + b.x) / 2;
-			c.y = (a.y + b.y) / 2;
-		}
-		$scope.$apply();
-	}
-
-	$scope.selected = '';
-
-	setTimeout(function() {
-   	_renderconnections();
-   	$( '.workspace' ).click(function(b) {
-   		console.log('clicked workspace');
-	   	$( 'ul.blocks li' ).removeClass('selected');
-	   	$( 'ul.connections li' ).removeClass('selected');
-    	$scope.selected = '';
-   		$scope.$apply();
-   	});
    	$( 'ul.blocks li' ).click(function(event) {
  	   	event.stopPropagation();
 			if (!$(this).hasClass('dragging')) {
@@ -520,11 +463,15 @@ function BuzzController($scope, $http) {
      		if ($scope.selected != this.dataset.id) {
 			   	$( 'ul.blocks li' ).removeClass('selected');
 			   	$( 'ul.connections li' ).removeClass('selected');
-		   		$(this).addClass('selected');
-		    	$scope.selected = this.dataset.id;
-     		} else {
-		   		$(this).removeClass('selected');
-		   		$scope.selected = '';
+			   	$scope.setSelection(this.dataset.id);
+		   		// $(this).addClass('selected');
+		    	// $scope.selected = this.dataset.id;
+		    	// $scope.sidebarPanel = true;
+	   		} else {
+		     	$scope.setSelection('');
+		   		// $(this).removeClass('selected');
+		   		// $scope.selected = '';
+	 	 	  	// $scope.sidebarPanel = false;
      		}
      		$scope.$apply();
 		  }
@@ -536,20 +483,36 @@ function BuzzController($scope, $http) {
    		if ($scope.selected != this.dataset.id) {
 		   	$( 'ul.blocks li' ).removeClass('selected');
 		   	$( 'ul.connections li' ).removeClass('selected');
-		   	$(this).addClass('selected');
-	    	$scope.selected = this.dataset.id;
+		   	$scope.setSelection(this.dataset.id);
+		   	// $(this).addClass('selected');
+	    	// $scope.selected = this.dataset.id;
+	    	// $scope.sidebarPanel = true;
 	    } else {
-     		$(this).removeClass('selected');
-	   		$scope.selected = '';
+		   	$scope.setSelection('');
+     		// $(this).removeClass('selected');
+	   		// $scope.selected = '';
+	    	// $scope.sidebarPanel = false;
      	}
-   		 _scope.$apply();
+   		_scope.$apply();
    	});
-		$( "ul.blocks li" ).draggable({
+   	try {
+	   	$('ul.blocks li').draggable("destroy");
+	  } catch(e) {
+	  }
+		$('ul.blocks li').draggable({
       start: function() {
       	// hide canvas
         $(this).addClass('dragging');
       	console.log('start drag', this);
       	_hidelines();
+      },
+      drag: function() {
+      	var idx = parseInt(this.dataset.index);
+      	var x = parseFloat(this.style.left);
+      	var y = parseFloat(this.style.top);
+      	_scope.blocks[idx].x = x+25;
+      	_scope.blocks[idx].y = y+25;
+      	_renderconnections();
       },
       stop: function() {
       	// save position
@@ -565,11 +528,296 @@ function BuzzController($scope, $http) {
       	console.log('y:',y);
       	_scope.blocks[idx].x = x+25;
       	_scope.blocks[idx].y = y+25;
-      	_renderconnections();
       	_showlines();
+      	_renderconnections();
       }
     });
-	}, 100);
+	}
+
+	$scope.getBlockPosition = function(block) {
+		return {
+			left: (block.x-25) + 'px',
+			top: (block.y-25) + 'px'
+		}
+	}
+
+	$scope.getConnectionPosition = function(conn) {
+		return {
+			left: (conn.x-12) + 'px',
+			top: (conn.y-12) + 'px'
+		}
+	}
+
+	$scope.createConnectionPanel = false;
+	$scope.createBlockPanel = false;
+
+	$scope.setSelection = function(id) {
+ 		if ($scope.state == 'create-connection') {
+ 			if (id != '') {
+ 				console.log('connect from', id);
+ 				$scope.connectFrom = id;
+ 				$scope.state = 'create-connection-2';
+ 			}
+ 		} else if ($scope.state == 'create-connection-2') {
+ 			if (id != '' && id != $scope.connectFrom) {
+ 				console.log('connect to', id);
+ 				$scope.connectTo = id;
+ 				$scope.state = '';
+				$scope.selected = '';
+				$scope.sidebarPanel = false;
+
+				var newid =	machine.generateId();
+				var idx = $scope.connections.length;
+				$scope.connections.push({
+					'id': 'connection'+idx,
+					'index': idx,
+					'from': $scope.connectFrom,
+					'to': $scope.connectTo,
+					'amount': '100'
+				});
+
+				_makeDraggable();
+	  		// $scope.$apply();
+ 			}
+ 		} else {
+  	 	$( 'ul.blocks li' ).removeClass('selected');
+	   	$( 'ul.connections li' ).removeClass('selected');
+	   	if (id != '') {
+  	 		$( 'ul.blocks li[data-id='+id+']' ).addClass('selected');
+	   		$( 'ul.connections li[data-id='+id+']' ).addClass('selected');
+	   	}
+			$scope.selected = id;
+			$scope.sidebarPanel = (id != '');
+  		// $scope.$apply();
+ 		}
+		_renderconnections();
+ 	}
+
+	$scope.beginAddSomething = function() {
+		$scope.setSelection('');
+		$scope.sidebarPanel = true;
+	}
+
+	$scope.beginAddBlock = function() {
+		$scope.setSelection('');
+		$scope.createBlockPanel = true;
+	}
+
+	$scope.deleteBlock = function() {
+		var id = $scope.selected;
+		for (var i=$scope.blocks.length-1; i>=0; i--) {
+			if ($scope.blocks[i].id == id)
+				$scope.blocks.splice(i, 1);
+		}
+		for (var i=$scope.connections.length-1; i>=0; i--) {
+			if ($scope.connections[i].from == id || $scope.connections[i].to == id)
+				$scope.connections.splice(i, 1);
+		}
+		for (var i=0; i<$scope.blocks.length; i++) {
+			$scope.blocks[i].index = i;
+		}
+		for (var i=0; i<$scope.connections.length; i++) {
+			$scope.connections[i].index = i;
+		}
+
+		$scope.$apply();
+
+		_renderconnections();
+		_makeDraggable();
+	}
+
+	$scope.deleteConnection = function() {
+		var id = $scope.selected;
+		for (var i=$scope.connections.length-1; i>=0; i--) {
+			if ($scope.connections[i].id == id)
+				$scope.connections.splice(i, 1);
+		}
+		$scope.$apply();
+		_renderconnections();
+		_makeDraggable();
+	}
+
+	$scope.beginAddConnection = function() {
+		$scope.connectFrom = '';
+		$scope.connectTo = '';
+		$scope.setSelection('');
+		$scope.state = 'create-connection';
+		$scope.sidebarPanel = false;
+		$scope.createConnectionPanel = true;
+	}
+
+	$scope.createConnection = function() {
+		$scope.createConnectionPanel = false;
+		$scope.sidebarPanel = false;
+   	_makeDraggable();
+	}
+
+	$scope.createBlock = function(type) {
+		var newid =	machine.generateId();
+		var idx = $scope.blocks.length;
+		$scope.blocks.push({
+			'id': 'block'+idx,
+			'type': type,
+			'index': idx,
+			'x': 0,
+			'y': 0
+		});
+		$scope.createBlockPanel = false;
+		$scope.sidebarPanel = false;
+		$scope.$apply();
+   	_makeDraggable();
+	}
+
+	var _scope = $scope;
+
+	var _findblock = function(id) {
+		for (var i=0; i<_scope.blocks.length; i++)
+			if (_scope.blocks[i].id == id)
+				return _scope.blocks[i];
+		return undefined;
+	}
+
+	var _hidelines = function() {
+		_linesVisible = true;
+		$('.workspace canvas').hide();
+		//$('.workspace .connections').hide();
+	}
+
+	var _showlines = function() {
+		_linesVisible = true;
+		$('.workspace canvas').show();
+		//$('.workspace .connections').show();
+	}
+
+	$scope.centerView = function() {
+		// center viewport. viewport
+		var ws = $(document);
+
+		var w = ws.width();
+		var h = ws.height();
+
+		var b_x1 = 9999;
+		var b_x2 = -9999;
+		var b_y1 = 9999;
+		var b_y2 = -9999;
+
+		for (var i=0; i<_scope.blocks.length; i++) {
+			var b = _scope.blocks[i];
+			if (b.x < b_x1) b_x1 = b.x;
+			if (b.y < b_y1) b_y1 = b.y;
+			if (b.x > b_x2) b_x2 = b.x;
+			if (b.y > b_y2) b_y2 = b.y;
+		}
+
+		console.log('block bounds:', b_x1,b_y1, b_x2,b_y2);
+
+		var b_cx = 0;
+		var b_cy = 0;
+		if (b_x2 >= b_x1 && b_y2 >= b_y1) {
+			b_cx = Math.floor((b_x2 + b_x1) / 2);
+			b_cy = Math.floor((b_y2 + b_y1) / 2);
+		}
+
+		console.log('block center', b_cx, b_cy);
+
+		for (var i=0; i<_scope.blocks.length; i++) {
+			var b = _scope.blocks[i];
+			b.x -= b_cx;
+			b.y -= b_cy;
+			b.x += Math.floor(w * 0.4); // a little bit to the left
+			b.y += Math.floor(h * 0.5);
+		}
+
+		$('.workspace').css({
+			left:'0px',
+			top:'0px'
+		});
+
+		_renderconnections();
+		$scope.$apply();
+	}
+
+	var _linesVisible = true;
+
+	var _renderconnections = function() {
+		if (!_linesVisible)
+			return;
+		console.log('render connections');
+		var ws = $(document);
+		var canvas = $('#arrows')[0];
+		canvas.width = ws.width();
+		canvas.height = ws.height();
+		var ctx = canvas.getContext('2d');
+
+		ctx.fillStyle = '#fff';
+		ctx.fillRect(0, 0, ctx.width, ctx.height);
+
+		for (var i=0; i<_scope.connections.length; i++) {
+			var c = _scope.connections[i];
+			var color = (c.id === _scope.selected) ? '#3c3' : '#888';
+			console.log('draw connection', c.id, _scope.selected, color);
+			var a = _findblock(c.from);
+			var b = _findblock(c.to);
+			c.x = (a.x + b.x) / 2;
+			c.y = (a.y + b.y) / 2;
+
+
+			ctx.lineWidth = 2;
+			ctx.strokeStyle = color;
+
+			var dx = b.x - a.x;
+			var dy = b.y - a.y;
+			var d = Math.sqrt(dx*dx + dy*dy);
+			dx /= d;
+			dy /= d;
+
+			ctx.beginPath();
+			ctx.moveTo(a.x, a.y);
+			ctx.lineTo(b.x, b.y);
+			ctx.stroke();
+
+			ctx.moveTo(b.x, b.y);
+			var rr = 12;
+			var rr2 = 1;
+			var ox = c.x-dx*rr;
+			var oy = c.y-dy*rr;
+			var ox2 = c.x+dx*rr;
+			var oy2 = c.y+dy*rr;
+
+			ctx.fillStyle = color;
+			ctx.beginPath();
+			ctx.moveTo(ox-dy*rr, oy+dx*rr);
+			ctx.lineTo(ox+dy*rr, oy-dx*rr);
+			ctx.lineTo(ox2+dy*rr2, oy2-dx*rr2);
+			ctx.lineTo(ox2-dy*rr2, oy2+dx*rr2);
+			ctx.fill();
+
+		}
+		$scope.$apply();
+	}
+
+	setTimeout(function() {
+   	_renderconnections();
+		$('.workspace').draggable({
+      start: function() {
+      },
+      drag: function() {
+      },
+      stop: function() {
+      }
+    });
+   	$( '.workspace' ).click(function(b) {
+   		console.log('clicked workspace', b, b.target);
+   		if (b.target.className === 'workspace' ||
+   			b.target.tagName === 'CANVAS') {
+		   	$( 'ul.blocks li' ).removeClass('selected');
+		   	$( 'ul.connections li' ).removeClass('selected');
+		   	$scope.setSelection('');
+		   	$scope.$apply();
+	   	}
+   	});
+   	_makeDraggable();
+	}, 10);
 };
 
 module.controller('BuzzController', BuzzController);

@@ -45,8 +45,37 @@
 				<span>{{b.title}}</span>
  			</li>
 		</ul>
-		<div class="sidebar">
-			prop editor selected={{selected}}
+	</div>
+	<div class="toolbar">
+		<b>func</b>:<i>ybeats</i>
+		&nbsp;
+		<a ng-click="beginAddSomething()">ADD SOMETHING</a>
+		<a ng-click="centerView()">CENTER</a>
+		&nbsp;
+		<a ng-click="centerView()">SAVE</a>
+		<a ng-click="centerView()">FORK</a>
+	</div>
+	<div class="sidebar" ng-show="sidebarPanel">
+
+		<a ng-click="beginAddBlock()">ADD BLOCK</a><br/>
+		<a ng-click="deleteBlock()">DELETE BLOCK</a><br/>
+		<a ng-click="beginAddConnection()">ADD CONNECTION</a><br/>
+		<a ng-click="deleteConnection()">DELETE CONNECTION</a><br/>
+		<hr/>
+
+		<div ng-show="createConnectionPanel">
+			<input ng-model="connection_from" />
+			<input ng-model="connection_to" />
+			<a ng-click="createConnection()">CREATE CONNECTION</a>
+			<hr/>
+		</div>
+
+		<div ng-show="createBlockPanel">
+			<a ng-click="createBlock('type1')">CREATE TYPE1</a>
+			<a ng-click="createBlock('type2')">CREATE TYPE2</a>
+			<a ng-click="createBlock('type3')">CREATE TYPE3</a>
+			<a ng-click="createBlock('type4')">CREATE TYPE4</a>
+			<hr/>
 		</div>
 	</div>
 </body>
