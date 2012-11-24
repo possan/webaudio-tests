@@ -402,6 +402,52 @@ function StudioController($scope, $http) {
 module.controller('StudioController', StudioController);
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function BuzzController($scope, $http) {
 
 	$scope.state = '';
@@ -459,19 +505,16 @@ function BuzzController($scope, $http) {
  	   	event.stopPropagation();
 			if (!$(this).hasClass('dragging')) {
 		   	event.preventDefault();
-     		console.log('clicked block 2', this);
+     		console.log('clicked block 2', this, addEventListener);
      		if ($scope.selected != this.dataset.id) {
-			   	$( 'ul.blocks li' ).removeClass('selected');
-			   	$( 'ul.connections li' ).removeClass('selected');
-			   	$scope.setSelection(this.dataset.id);
-		   		// $(this).addClass('selected');
-		    	// $scope.selected = this.dataset.id;
-		    	// $scope.sidebarPanel = true;
+     			if ($scope.selected != '' && (event.shiftKey || event.altKey)) {
+     				// connect block shortcut, select one, shift-click the destination..
+     				$scope.connectBlocks($scope.selected, this.dataset.id);
+     			} else {
+			   		$scope.setSelection(this.dataset.id);
+	   			}
 	   		} else {
 		     	$scope.setSelection('');
-		   		// $(this).removeClass('selected');
-		   		// $scope.selected = '';
-	 	 	  	// $scope.sidebarPanel = false;
      		}
      		$scope.$apply();
 		  }
@@ -481,17 +524,9 @@ function BuzzController($scope, $http) {
 	   	event.stopPropagation();
    		console.log('clicked connection 2', this);
    		if ($scope.selected != this.dataset.id) {
-		   	$( 'ul.blocks li' ).removeClass('selected');
-		   	$( 'ul.connections li' ).removeClass('selected');
 		   	$scope.setSelection(this.dataset.id);
-		   	// $(this).addClass('selected');
-	    	// $scope.selected = this.dataset.id;
-	    	// $scope.sidebarPanel = true;
 	    } else {
 		   	$scope.setSelection('');
-     		// $(this).removeClass('selected');
-	   		// $scope.selected = '';
-	    	// $scope.sidebarPanel = false;
      	}
    		_scope.$apply();
    	});
@@ -551,6 +586,24 @@ function BuzzController($scope, $http) {
 	$scope.createConnectionPanel = false;
 	$scope.createBlockPanel = false;
 
+	$scope.connectBlocks = function(from, to) {
+		var newid =	machine.generateId();
+		var idx = $scope.connections.length;
+		$scope.connections.push({
+			'id': newid,
+			'index': idx,
+			'from': from,
+			'to': to,
+			'amount': '100'
+		});
+		_renderconnections();
+		console.log('connections', $scope.connections);
+		_makeDraggable();
+ 		$scope.state = '';
+		$scope.selected = '';
+		$scope.sidebarPanel = false;
+	}
+
 	$scope.setSelection = function(id) {
  		if ($scope.state == 'create-connection') {
  			if (id != '') {
@@ -563,21 +616,7 @@ function BuzzController($scope, $http) {
  				console.log('connect to', id);
  				$scope.connectTo = id;
  				$scope.state = '';
-				$scope.selected = '';
-				$scope.sidebarPanel = false;
-
-				var newid =	machine.generateId();
-				var idx = $scope.connections.length;
-				$scope.connections.push({
-					'id': 'connection'+idx,
-					'index': idx,
-					'from': $scope.connectFrom,
-					'to': $scope.connectTo,
-					'amount': '100'
-				});
-
-				_makeDraggable();
-	  		// $scope.$apply();
+				$scope.connectBlocks($scope.connectFrom, $scope.connectTo);
  			}
  		} else {
   	 	$( 'ul.blocks li' ).removeClass('selected');
@@ -603,8 +642,9 @@ function BuzzController($scope, $http) {
 		$scope.createBlockPanel = true;
 	}
 
-	$scope.deleteBlock = function() {
-		var id = $scope.selected;
+	$scope._deleteBlock = function(id) {
+		if (id == '')
+			return;
 		for (var i=$scope.blocks.length-1; i>=0; i--) {
 			if ($scope.blocks[i].id == id)
 				$scope.blocks.splice(i, 1);
@@ -619,19 +659,43 @@ function BuzzController($scope, $http) {
 		for (var i=0; i<$scope.connections.length; i++) {
 			$scope.connections[i].index = i;
 		}
+	}
 
+	$scope.deleteBlock = function() {
+		var id = $scope.selected;
+		if (id == '')
+			return;
+		$scope._deleteBlock(id);
 		$scope.$apply();
+		_renderconnections();
+		_makeDraggable();
+	}
 
+	$scope._deleteConnection = function(id) {
+		if (id == '')
+			return;
+		for (var i=$scope.connections.length-1; i>=0; i--) {
+			if ($scope.connections[i].id == id)
+				$scope.connections.splice(i, 1);
+		}
+	}
+
+	$scope.deleteBlockOrConnection = function() {
+		var id = $scope.selected;
+		if (id == '')
+			return;
+		$scope._deleteBlock(id);
+		$scope._deleteConnection(id);
+		$scope.$apply();
 		_renderconnections();
 		_makeDraggable();
 	}
 
 	$scope.deleteConnection = function() {
 		var id = $scope.selected;
-		for (var i=$scope.connections.length-1; i>=0; i--) {
-			if ($scope.connections[i].id == id)
-				$scope.connections.splice(i, 1);
-		}
+		if (id == '')
+			return;
+		$scope._deleteConnection(id);
 		$scope.$apply();
 		_renderconnections();
 		_makeDraggable();
@@ -748,34 +812,27 @@ function BuzzController($scope, $http) {
 		canvas.width = ws.width();
 		canvas.height = ws.height();
 		var ctx = canvas.getContext('2d');
-
 		ctx.fillStyle = '#fff';
 		ctx.fillRect(0, 0, ctx.width, ctx.height);
-
 		for (var i=0; i<_scope.connections.length; i++) {
 			var c = _scope.connections[i];
 			var color = (c.id === _scope.selected) ? '#3c3' : '#888';
 			console.log('draw connection', c.id, _scope.selected, color);
 			var a = _findblock(c.from);
 			var b = _findblock(c.to);
-			c.x = (a.x + b.x) / 2;
-			c.y = (a.y + b.y) / 2;
-
-
+			c.x = Math.round((a.x + b.x) / 2);
+			c.y = Math.round((a.y + b.y) / 2);
 			ctx.lineWidth = 2;
 			ctx.strokeStyle = color;
-
 			var dx = b.x - a.x;
 			var dy = b.y - a.y;
 			var d = Math.sqrt(dx*dx + dy*dy);
 			dx /= d;
 			dy /= d;
-
 			ctx.beginPath();
 			ctx.moveTo(a.x, a.y);
 			ctx.lineTo(b.x, b.y);
 			ctx.stroke();
-
 			ctx.moveTo(b.x, b.y);
 			var rr = 12;
 			var rr2 = 1;
@@ -783,7 +840,6 @@ function BuzzController($scope, $http) {
 			var oy = c.y-dy*rr;
 			var ox2 = c.x+dx*rr;
 			var oy2 = c.y+dy*rr;
-
 			ctx.fillStyle = color;
 			ctx.beginPath();
 			ctx.moveTo(ox-dy*rr, oy+dx*rr);
@@ -791,7 +847,6 @@ function BuzzController($scope, $http) {
 			ctx.lineTo(ox2+dy*rr2, oy2-dx*rr2);
 			ctx.lineTo(ox2-dy*rr2, oy2+dx*rr2);
 			ctx.fill();
-
 		}
 		$scope.$apply();
 	}
@@ -799,25 +854,29 @@ function BuzzController($scope, $http) {
 	setTimeout(function() {
    	_renderconnections();
 		$('.workspace').draggable({
-      start: function() {
-      },
-      drag: function() {
-      },
-      stop: function() {
-      }
+      start: function() {},
+      drag: function() {},
+      stop: function() {}
     });
    	$( '.workspace' ).click(function(b) {
    		console.log('clicked workspace', b, b.target);
    		if (b.target.className === 'workspace' ||
    			b.target.tagName === 'CANVAS') {
-		   	$( 'ul.blocks li' ).removeClass('selected');
-		   	$( 'ul.connections li' ).removeClass('selected');
 		   	$scope.setSelection('');
 		   	$scope.$apply();
 	   	}
    	});
    	_makeDraggable();
+   	$scope.centerView();
 	}, 10);
+
+	$(window).keyup(function(event) {
+		console.log('key up', event, event.keyCode, 46, 8);
+		if (event.keyCode == 46) {
+			$scope.deleteBlockOrConnection();
+		}
+		return false;
+	});
 };
 
 module.controller('BuzzController', BuzzController);

@@ -38,7 +38,7 @@
 	<div class="workspace">
 		<canvas id="arrows" width="500" height="300"></canvas>
 		<ul id="connections" class="connections">
-			<li ng-repeat="c in connections" ng-style="getConnectionPosition(c)" data-id="{{c.id}}" data-index="{{c.index}}"></li>
+			<li ng-repeat="c in connections" ng-style="getConnectionPosition(c)" data-id="{{c.id}}" data-index="{{c.index}}">{{c.id}}</li>
 		</ul>
 		<ul id="blocks" class="blocks">
 			<li ng-repeat="b in blocks" ng-style="getBlockPosition(b)" data-id="{{b.id}}" data-index="{{b.index}}">
