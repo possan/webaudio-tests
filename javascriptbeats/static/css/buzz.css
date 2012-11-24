@@ -34,26 +34,46 @@ ul.blocks {
 
 ul.blocks li {
 	position: absolute;
-	border: 1px solid #444;
 	padding: 0px;
 	margin: 0;
 	width: 50px;
 	height: 50px;
-	background-color: #eee;
+	background-color: #666;
 	cursor: pointer;
-	box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+	border-radius: 10px;
+	box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+
+ul.blocks li:hover {
+	-webkit-transform: scale(1.1);
+	z-index: 99;
 }
 
 ul.blocks li.dragging {
 	background-color: #666;
-	-webkit-transform: scale(1.15);
+	-webkit-transform: scale(1.2);
 	opacity: 0.66;
 	z-index: 99;
 	box-shadow: 0 5px 15px rgba(0,0,0,0.5);
 }
 
 ul.blocks li.selected {
-	background-color: #66f;
+	background-color: #39f;
+}
+
+ul.blocks li img {
+	position: absolute;
+	left: 5px;
+	top: 5px;
+}
+
+ul.blocks li span {
+	position: absolute;
+	left: -10px;
+	top: 55px;
+	width: 70px;
+	color: #666;
+	text-align: center;
 }
 
 ul.connections {
@@ -79,11 +99,30 @@ ul.connections li {
 .sidebar {
 	position: absolute;
 	top: 0px;
-	right: 	0px;
+	right: -270px;
 	width: 250px;
 	height: 100%;
-	background-color: #aaa;
+	padding: 20px;
+	background-color: rgba(0,0,0,0.8);
 	border-left: 1px solid #666;
+	-webkit-transition: right ease-in-out 0.3s;
+	color: #fff;
+}
+
+.sidebar.visible {
+	right: 0px;
+	-webkit-transform: translateX(0px);
+}
+
+.sidebar a {
+	color: #ff0;
+}
+
+.sidebar h3 {
+	color: #fff;
+	font-size: 170%;
+	margin: 0 0 15px 0;
+	padding: 0;
 }
 
 .toolbar {
@@ -111,5 +150,55 @@ ul.connections li {
 	background-color: #666;
 	color: #fff;
 	border-bottom: 1px solid #666;
+}
+
+ul.createdevice {
+	clear: both;
+	list-style: none;
+	display: block;
+	margin: 0;
+	padding: 0;
+}
+
+ul.createdevice li {
+	position: relative;
+	display: block;
+	margin: 0 0 10px 10px;
+	float: left;
+}
+
+ul.createdevice li a {
+	display: block;
+	width: 70px;
+	height: 80px;
+	padding: 0px;
+	-webkit-transition: all 0.1s ease-out;
+}
+
+ul.createdevice li a:hover {
+	-webkit-transform: scale(1.33);
+	z-index: 99;
+}
+
+ul.createdevice li a span {
+	position: absolute;
+	left: 0px;
+	top: 55px;
+	width: 70px;
+	text-align: center;
+	color: #fff;
+}
+
+ul.createdevice li a img {
+	background-color: #666;
+	border-radius: 5px;
+	position: absolute;
+	left: 10px;
+	padding: 5px;
+	top: 0px;
+}
+
+ul.createdevice li a:hover img {
+	background-color: #39f;
 }
 

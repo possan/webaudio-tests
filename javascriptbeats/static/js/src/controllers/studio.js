@@ -456,6 +456,7 @@ function BuzzController($scope, $http) {
 	$scope.blocks = [
 		{
 			id: 'block1',
+			type: 'sampler',
 			index: 0,
 			title: 'Block 1',
 			x: 100,
@@ -463,6 +464,7 @@ function BuzzController($scope, $http) {
 		},
 		{
 			id: 'block2',
+			type: 'reverb',
 			index: 1,
 			title: 'Block 2',
 			x: 200,
@@ -470,6 +472,7 @@ function BuzzController($scope, $http) {
 		},
 		{
 			id: 'block3',
+			type: 'synth',
 			index: 2,
 			title: 'Block 3',
 			x: 180,
@@ -477,6 +480,7 @@ function BuzzController($scope, $http) {
 		},
 		{
 			id: 'block4',
+			type: 'delay',
 			index: 3,
 			title: 'Block 4',
 			x: 110,
@@ -484,6 +488,7 @@ function BuzzController($scope, $http) {
 		},
 		{
 			id: 'bloc5k',
+			type: 'master',
 			index: 4,
 			title: 'Block 5',
 			x: 130,
@@ -495,6 +500,13 @@ function BuzzController($scope, $http) {
 		{id: 'ca', index: 0, from:'block1', to:'block2'},
 		{id: 'cb', index: 1, from:'block2', to:'block3'},
 	];
+
+	var _showSidebar = function(on) {
+		if (on)
+			$('#sidebar').addClass('visible');
+		else
+			$('#sidebar').removeClass('visible');
+	}
 
 	var _makeDraggable = function() {
    	$( 'ul.blocks li' ).unbind('click');
@@ -582,6 +594,7 @@ function BuzzController($scope, $http) {
 		}
 	}
 
+	$scope.editParametersPanel = false;
 	$scope.createConnectionPanel = false;
 	$scope.createBlockPanel = false;
 
@@ -600,7 +613,7 @@ function BuzzController($scope, $http) {
 		_makeDraggable();
  		$scope.state = '';
 		$scope.selected = '';
-		$scope.sidebarPanel = false;
+		_showSidebar(false);
 	}
 
 	$scope.setSelection = function(id) {
@@ -610,6 +623,9 @@ function BuzzController($scope, $http) {
  				$scope.connectFrom = id;
  				$scope.state = 'create-connection-2';
 	   		_setHelp('Click the block to connect to');
+	  		_showSidebar(false);
+	   		$scope.editParametersPanel = false;
+				$scope.createBlockPanel = false;
  			}
  		} else if ($scope.state == 'create-connection-2') {
  			if (id != '' && id != $scope.connectFrom) {
@@ -618,6 +634,9 @@ function BuzzController($scope, $http) {
  				$scope.state = '';
 				$scope.connectBlocks($scope.connectFrom, $scope.connectTo);
 	   		_setHelp('');
+	  		_showSidebar(false);
+		 		$scope.editParametersPanel = false;
+				$scope.createBlockPanel = false;
  			}
  		} else {
   	 	$( 'ul.blocks li' ).removeClass('selected');
@@ -626,11 +645,16 @@ function BuzzController($scope, $http) {
   	 		$( 'ul.blocks li[data-id='+id+']' ).addClass('selected');
 	   		$( 'ul.connections li[data-id='+id+']' ).addClass('selected');
 	   		_setHelp('Shift click the second block to connect them, click delete to delete the selected object');
+	   		$scope.editParametersPanel = true;
+				_showSidebar(true);
+				$scope.createBlockPanel = false;
 	   	} else {
 	   		_setHelp('');
+	   		$scope.editParametersPanel = false;
+				_showSidebar(false);
+				$scope.createBlockPanel = true;
 	   	}
 			$scope.selected = id;
-			$scope.sidebarPanel = (id != '');
   		// $scope.$apply();
  		}
 		_renderconnections();
@@ -638,12 +662,11 @@ function BuzzController($scope, $http) {
 
 	$scope.beginAddSomething = function() {
 		$scope.setSelection('');
-		$scope.sidebarPanel = true;
+		_showSidebar(true);
 	 	_setHelp('');//Click the block to connect to');
 	}
 
 	$scope.beginAddBlock = function() {
-		$scope.setSelection('');
 		$scope.createBlockPanel = true;
 		_setHelp('Click the type of block you want to add');
 	}
@@ -652,8 +675,13 @@ function BuzzController($scope, $http) {
 		if (id == '')
 			return;
 		for (var i=$scope.blocks.length-1; i>=0; i--) {
-			if ($scope.blocks[i].id == id)
+			if ($scope.blocks[i].id === id) {
+				if ($scope.blocks[i].type === 'master') {
+					alert('You can not delete the master block');
+					return;
+				}
 				$scope.blocks.splice(i, 1);
+			}
 		}
 		for (var i=$scope.connections.length-1; i>=0; i--) {
 			if ($scope.connections[i].from == id || $scope.connections[i].to == id)
@@ -682,6 +710,7 @@ function BuzzController($scope, $http) {
 			return;
 		$scope._deleteBlock(id);
 		$scope.$apply();
+	 	_showSidebar(false);
 		_renderconnections();
 		_makeDraggable();
 		_setHelp('');
@@ -714,6 +743,7 @@ function BuzzController($scope, $http) {
 			return;
 		$scope._deleteConnection(id);
 		$scope.$apply();
+		_showSidebar(false);
 		_renderconnections();
 		_makeDraggable();
 		_setHelp('');
@@ -725,13 +755,13 @@ function BuzzController($scope, $http) {
 		$scope.setSelection('');
 		_setHelp('Click on the block you want to connect from...');
 		$scope.state = 'create-connection';
-		$scope.sidebarPanel = false;
+		_showSidebar(false);
 		$scope.createConnectionPanel = true;
 	}
 
 	$scope.createConnection = function() {
 		$scope.createConnectionPanel = false;
-		$scope.sidebarPanel = false;
+ 		_showSidebar(false);
    	_makeDraggable();
 	}
 
@@ -746,8 +776,9 @@ function BuzzController($scope, $http) {
 			'x': b.x1-50,
 			'y': b.cy
 		});
-		$scope.createBlockPanel = false;
-		$scope.sidebarPanel = false;
+		// $scope.createBlockPanel = false;
+		// $scope.createBlockPanel = false;
+		_showSidebar(false);
 		$scope.$apply();
    	_makeDraggable();
 	}
@@ -900,14 +931,17 @@ function BuzzController($scope, $http) {
 	   	}
    	});
    	_makeDraggable();
+   	_showSidebar(true);
+		$scope.createBlockPanel = true;
    	$scope.centerView();
 		_setHelp('');
-	}, 10);
+	}, 100);
 
 	$(window).keyup(function(event) {
 		console.log('key up', event, event.keyCode, 46, 8);
 		if (event.keyCode == 46) {
 			$scope.deleteBlockOrConnection();
+	   	_showSidebar(false);
 		}
 		return false;
 	});

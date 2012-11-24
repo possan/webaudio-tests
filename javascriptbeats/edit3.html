@@ -35,6 +35,7 @@
 	<script type="text/javascript" src="/static/js/src/bootstrap.js"></script>
 </head>
 <body onload="bootstrap();" ng-controller="BuzzController">
+
 	<div class="workspace">
 		<canvas id="arrows" width="500" height="300"></canvas>
 		<ul id="connections" class="connections">
@@ -42,6 +43,7 @@
 		</ul>
 		<ul id="blocks" class="blocks">
 			<li ng-repeat="b in blocks" ng-style="getBlockPosition(b)" data-id="{{b.id}}" data-index="{{b.index}}">
+				<img src="/static/img/device_{{b.type}}_40.png" />
 				<span>{{b.title}}</span>
  			</li>
 		</ul>
@@ -58,27 +60,71 @@
 		<a ng-click="centerView()">SAVE</a>
 		<a ng-click="centerView()">FORK</a>
 	</div>
-	<div class="sidebar" ng-show="sidebarPanel">
 
-		<a ng-click="beginAddBlock()">ADD BLOCK</a><br/>
-		<a ng-click="deleteBlock()">DELETE BLOCK</a><br/>
-		<a ng-click="beginAddConnection()">ADD CONNECTION</a><br/>
-		<a ng-click="deleteConnection()">DELETE CONNECTION</a><br/>
-		<hr/>
+	<div class="sidebar" id="sidebar">
 
-		<div ng-show="createConnectionPanel">
-			<input ng-model="connection_from" />
-			<input ng-model="connection_to" />
-			<a ng-click="createConnection()">CREATE CONNECTION</a>
-			<hr/>
+		<div ng-show="editParametersPanel">
+			<h3>Edit parameters</h3>
+			<ul class="params">
+			</ul>
+			<br/>
+			<a ng-click="deleteBlock()">DELETE BLOCK</a><br/>
+			<a ng-click="deleteConnection()">DELETE CONNECTION</a><br/>
 		</div>
 
 		<div ng-show="createBlockPanel">
-			<a ng-click="createBlock('type1')">CREATE TYPE1</a>
-			<a ng-click="createBlock('type2')">CREATE TYPE2</a>
-			<a ng-click="createBlock('type3')">CREATE TYPE3</a>
-			<a ng-click="createBlock('type4')">CREATE TYPE4</a>
-			<hr/>
+			<h3>Create</h3>
+			<ul class="createdevice">
+				<li>
+					<a ng-click="beginAddConnection()">
+						<img src="/static/img/connection_40.png" />
+						<span>Connection</span>
+					</a>
+				</li>
+				<li>
+					<a ng-click="createBlock('synth')">
+						<img src="/static/img/device_synth_40.png" />
+						<span>Mono synth</span>
+					</a>
+				</li>
+				<li>
+					<a ng-click="createBlock('sampler')">
+						<img src="/static/img/device_sampler_40.png" />
+						<span>Sampler</span>
+					</a>
+				</li>
+				<li>
+					<a ng-click="createBlock('delay')">
+						<img src="/static/img/device_delay_40.png" />
+						<span>Delay</span>
+					</a>
+				</li>
+				<li>
+					<a ng-click="createBlock('compressor')">
+						<img src="/static/img/device_compressor_40.png" />
+						<span>Compressor</span>
+					</a>
+				</li>
+				<li>
+					<a ng-click="createBlock('filter')">
+						<img src="/static/img/device_filter_40.png" />
+						<span>Filter</span>
+					</a>
+				</li>
+				<li>
+					<a ng-click="createBlock('reverb')">
+						<img src="/static/img/device_reverb_40.png" />
+						<span>Reverb</span>
+					</a>
+				</li>
+				<li>
+					<a ng-click="createBlock('waveshaper')">
+						<img src="/static/img/device_waveshaper_40.png" />
+						<span>Waveshaper</span>
+					</a>
+				</li>
+			</ul>
+			<br/>
 		</div>
 	</div>
 </body>
