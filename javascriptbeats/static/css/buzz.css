@@ -46,7 +46,7 @@ ul.blocks li {
 
 ul.blocks li:hover {
 	-webkit-transform: scale(1.1);
-	z-index: 99;
+	z-index: 5;
 }
 
 ul.blocks li.dragging {
@@ -99,13 +99,14 @@ ul.connections li {
 .sidebar {
 	position: absolute;
 	top: 0px;
-	right: -270px;
+	z-index: 10;
+	right: -290px;
 	width: 250px;
 	height: 100%;
 	padding: 20px;
 	background-color: rgba(0,0,0,0.8);
 	border-left: 1px solid #666;
-	-webkit-transition: right ease-in-out 0.3s;
+	-webkit-transition: right ease-in-out 0.25s;
 	color: #fff;
 }
 
@@ -125,23 +126,90 @@ ul.connections li {
 	padding: 0;
 }
 
+
+
+
+
+
+
+
 .toolbar {
 	position: absolute;
-	padding: 5px;
-	font-size: 140%;
+	padding: 0;
 	top: 0px;
 	left: 	0px;
+	height: 30px;
 	width: 100%;
-	background-color: #666;
+	background-color: #444;
+	background: #444; /* Old browsers */
+	background: -moz-linear-gradient(top, #555 0%, #333 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#555), color-stop(100%,#333)); /* Chrome,Safari4+ */
 	color: #fff;
 	border-bottom: 1px solid #666;
 }
 
-.toolbar a {
-	color: #ff0;
+.toolbar ul {
+	display: block;
+	list-style: none;
+	margin: 0;
+	padding: 0;
 }
 
-.help {
+.toolbar ul li {
+	height: 30px;
+	float: left;
+	/* border-left: 1px solid rgba(255,255,255,0.2);
+	border-right: 1px solid rgba(0,0,0,0.5);
+	*/
+	margin: 0 10px 0 0;
+	padding: 0;
+}
+
+.toolbar ul li.logo h1 {
+	display: block;
+	margin: 5px 10px;
+	padding: 0px;
+	font-size: 12pt;
+	font-weight: normal;
+}
+
+.toolbar ul li a.button {
+	display: inline-block;
+	border: 1px solid #666;
+	border-top: 1px solid #aaa;
+	padding: 5px 8px;
+	margin: 3px 0 0 0;
+	color: #fff;
+	background-color: #555;
+	background: -moz-linear-gradient(top, #666 0%, #555 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#666), color-stop(100%,#555)); /* Chrome,Safari4+ */
+	text-shadow: 0 1 0 #000;
+	text-decoration: none;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.toolbar ul li a.button.down,
+.toolbar ul li a.button:active {
+	border-top: 1px solid #444;
+	box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
+	background: -moz-linear-gradient(top, #555 0%, #666 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#555), color-stop(100%,#666)); /* Chrome,Safari4+ */
+	color: #cf4;
+	text-shadow: 0 1px 1px #000;
+}
+
+.toolbar ul li a.button:hover {
+	background-color: #666;
+	background: -moz-linear-gradient(top, #777 0%, #666 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#777), color-stop(100%,#666)); /* Chrome,Safari4+ */
+	border-top: 1px solid #ccc;
+}
+
+
+
+
+
+div.help {
 	position: absolute;
 	padding: 3px;
 	bottom: 0px;
@@ -202,3 +270,104 @@ ul.createdevice li a:hover img {
 	background-color: #39f;
 }
 
+
+
+ul.params {
+	list-style: none;
+	display: block;
+	padding: 0;
+	margin: 0 0 10px 0;
+}
+
+
+ul.params li {
+	position: relative;
+	display: block;
+	padding: 0;
+	margin: 0 0 15px 0;
+}
+
+ul.params li label {
+	display: block;
+	font-size: 110%;
+	padding-bottom: 0px;
+	border-bottom: 1px solid #888;
+	margin-bottom: 2px;
+}
+
+ul.params li a.presets {
+	display: block;
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	text-decoration: none;
+}
+
+ul.params li input {
+	width: 100%;
+	border: 0;
+	-webkit-box-sizing: border-box;
+	background-color: rgba(0,0,0,0);
+	outline: none;
+	color: #fff;
+	padding: 0;
+	-webkit-transition: all 0.2s ease-in-out;
+}
+
+ul.params li:hover input {
+	background-color: #fff;
+	color: #000;
+	padding: 5px;
+}
+
+ul.params li span.help {
+	display: block;
+	overflow: hidden;
+	font-size: 90%;
+	color: #ccc;
+	height: 0px;
+	-webkit-transition: height 0.33s ease-in-out;
+}
+
+ul.params li:hover span.help {
+	height: 50px;
+}
+
+.sidebar header {
+	position: relative;
+	margin: 0 0 15px 0;
+}
+
+.sidebar header h3 {
+	margin: 0 0 2px 0;
+}
+
+.sidebar header p {
+	margin: 0 0 2px 0;
+}
+
+.sidebar header img.icon {
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	width: 20px;
+	height: 20px;
+}
+
+div.sidebar a.button,
+div.sidebar button {
+	display: inline-block;
+	padding: 10px 15px;
+	background-color: #ff0;
+	color: #333;
+	margin: 0 3px 3px 0;
+	font-weight: bold;
+	text-decoration: none;
+	border-radius: 5px;
+}
+
+
+div.sidebar a.button:hover,
+div.sidebar button:hover {
+	background-color: #fff;
+}

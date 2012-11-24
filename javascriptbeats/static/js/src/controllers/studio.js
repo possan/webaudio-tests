@@ -597,6 +597,7 @@ function BuzzController($scope, $http) {
 	$scope.editParametersPanel = false;
 	$scope.createConnectionPanel = false;
 	$scope.createBlockPanel = false;
+	$scope.helpPanel = false;
 
 	$scope.connectBlocks = function(from, to) {
 		var newid =	machine.generateId();
@@ -624,8 +625,8 @@ function BuzzController($scope, $http) {
  				$scope.state = 'create-connection-2';
 	   		_setHelp('Click the block to connect to');
 	  		_showSidebar(false);
-	   		$scope.editParametersPanel = false;
-				$scope.createBlockPanel = false;
+	   		// $scope.editParametersPanel = false;
+				// $scope.createBlockPanel = false;
  			}
  		} else if ($scope.state == 'create-connection-2') {
  			if (id != '' && id != $scope.connectFrom) {
@@ -635,8 +636,8 @@ function BuzzController($scope, $http) {
 				$scope.connectBlocks($scope.connectFrom, $scope.connectTo);
 	   		_setHelp('');
 	  		_showSidebar(false);
-		 		$scope.editParametersPanel = false;
-				$scope.createBlockPanel = false;
+		 		// $scope.editParametersPanel = false;
+				// $scope.createBlockPanel = false;
  			}
  		} else {
   	 	$( 'ul.blocks li' ).removeClass('selected');
@@ -645,14 +646,15 @@ function BuzzController($scope, $http) {
   	 		$( 'ul.blocks li[data-id='+id+']' ).addClass('selected');
 	   		$( 'ul.connections li[data-id='+id+']' ).addClass('selected');
 	   		_setHelp('Shift click the second block to connect them, click delete to delete the selected object');
-	   		$scope.editParametersPanel = true;
-				_showSidebar(true);
+	   		_showSidebar(true);
+				$scope.editParametersPanel = true;
 				$scope.createBlockPanel = false;
+				$scope.helpPanel = false;
 	   	} else {
 	   		_setHelp('');
-	   		$scope.editParametersPanel = false;
+	   		// $scope.editParametersPanel = false;
 				_showSidebar(false);
-				$scope.createBlockPanel = true;
+				// $scope.createBlockPanel = true;
 	   	}
 			$scope.selected = id;
   		// $scope.$apply();
@@ -660,16 +662,30 @@ function BuzzController($scope, $http) {
 		_renderconnections();
  	}
 
-	$scope.beginAddSomething = function() {
+ 	$scope.toolbarAdd = function() {
 		$scope.setSelection('');
+ 		$scope.editParametersPanel = false;
+		$scope.createBlockPanel = true;
+		$scope.helpPanel = false;
 		_showSidebar(true);
 	 	_setHelp('');//Click the block to connect to');
-	}
+ 	}
 
-	$scope.beginAddBlock = function() {
-		$scope.createBlockPanel = true;
-		_setHelp('Click the type of block you want to add');
-	}
+ 	$scope.toolbarSong = function() {
+ 	}
+
+ 	$scope.toolbarSave = function() {
+ 	}
+
+ 	$scope.toolbarFork = function() {
+ 	}
+
+ 	$scope.toolbarHelp = function() {
+ 		_showSidebar(true);
+ 		$scope.editParametersPanel = false;
+		$scope.createBlockPanel = false;
+		$scope.helpPanel = true;
+ 	}
 
 	$scope._deleteBlock = function(id) {
 		if (id == '')
@@ -839,7 +855,7 @@ function BuzzController($scope, $http) {
 		}
 	}
 
-	$scope.centerView = function() {
+	$scope.toolbarCenter = function() {
 		// center viewport. viewport
 		var ws = $(document);
 
@@ -933,8 +949,10 @@ function BuzzController($scope, $http) {
    	_makeDraggable();
    	_showSidebar(true);
 		$scope.createBlockPanel = true;
-   	$scope.centerView();
+   	$scope.toolbarCenter();
 		_setHelp('');
+
+		$scope.setSelection('block1');
 	}, 100);
 
 	$(window).keyup(function(event) {

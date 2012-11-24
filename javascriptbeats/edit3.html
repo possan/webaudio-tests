@@ -52,28 +52,114 @@
 	<div id="help" class="help">{{helphtml}}</div>
 
 	<div class="toolbar">
-		<b>func</b>:<i>ybeats</i>
-		&nbsp;
-		<a ng-click="beginAddSomething()">ADD SOMETHING</a>
-		<a ng-click="centerView()">CENTER</a>
-		&nbsp;
-		<a ng-click="centerView()">SAVE</a>
-		<a ng-click="centerView()">FORK</a>
+		<ul>
+			<li class="logo">
+				<h1><i>javascript</i><b>beats</b></h1>
+			</li>
+			<li></li>
+			<li class="">
+				<a ng-click="toolbarSong()" class="button toggleable down">
+					PLAY
+				</a>
+			</li>
+			<li>
+				<a ng-click="toolbarAdd()" class="button">
+					ADD BLOCK
+				</a>
+			</li>
+			<li>
+				<a ng-click="toolbarSong()" class="button">
+					TEMPO
+				</a>
+			</li>
+			<li>
+				<a ng-click="toolbarCenter()" class="button">
+					CENTER
+				</a>
+			</li>
+			<li class="button">
+				<a ng-click="toolbarSave()" class="button">
+					SAVE
+				</a>
+				<a ng-click="toolbarFork()" class="button">
+					FORK
+				</a>
+			</li>
+			<li>
+				<a ng-click="toolbarHelp()" class="button">
+					HELP
+				</a>
+			</li>
+		</ul>
 	</div>
 
 	<div class="sidebar" id="sidebar">
 
+		<div ng-show="helpPanel">
+			<header>
+				<h3>Edit synth</h3>
+				<p>Donec non tempus massa. Sed ultricies, ante ut tincidunt viverra, magna enim tristique tellus, a laoreet ligula mauris sed ante. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Duis mollis, arcu nec ullamcorper iaculis, arcu purus pellentesque lacus, </p>
+				<img src="/static/img/device_master_40.png" class="icon" />
+			</header>
+			<h1>
+				func:y beats
+			</h1>
+			<p>
+				A Web Audio Experiment by: <a href="http://twitter.com/possan">@possan</a> - Code available on <a href="#">github</a> (<i>Only tested in Chrome so far...</i>)
+			</p>
+
+			<p>Maecenas ultrices arcu sed nibh cursus dapibus. Suspendisse potenti. Mauris sollicitudin eros et odio ultrices consectetur. Morbi eget dictum tellus. Sed vel dolor bibendum nulla dapibus vehicula. Nullam vehicula vestibulum pretium. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Suspendisse et erat lorem.</p>
+		<p>Vitae aliquet neque. Praesent eu dignissim ante. Fusce pellentesque posuere ipsum a commodo. Phasellus a consequat augue. Donec congue ante et orci accumsan ac sodales urna condimentum. </p>
+		<p>Quisque nec sem vitae libero faucibus euismod a et urna. Vestibulum congue mattis dignissim. Ut ullamcorper erat velit, eget volutpat urna. Nulla nec rhoncus justo.
+</p><p>
+Maecenas odio elit, porta sit amet vestibulum vel, posuere sed mi. Nullam ut egestas lectus. Etiam erat sapien, dapibus sed dictum sed, ornare eu justo. Nunc non risus non ligula blandit cursus. Phasellus luctus elementum mi vel ultricies. Nam dictum scelerisque auctor. Sed volutpat orci ut est fermentum pellentesque.
+
+</p>
+
+
+		</div>
+
+
 		<div ng-show="editParametersPanel">
-			<h3>Edit parameters</h3>
+			<header>
+				<h3>Edit synth</h3>
+				<p>Donec non tempus massa. Sed ultricies, ante ut tincidunt viverra, magna enim tristique tellus, a laoreet ligula mauris sed ante. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Duis mollis, arcu nec ullamcorper iaculis, arcu purus pellentesque lacus, </p>
+				<img src="/static/img/device_master_40.png" class="icon" />
+			</header>
+
 			<ul class="params">
+				<li>
+					<label>Title</label>
+					<input type="text" value="Lead synth"></input>
+				</li>
+				<li class="expanded">
+					<label>Gate</label>
+					<input type="text" value="(step % 3) == 0"></input>
+					<a href="#" class="presets">Presets...</a>
+					<span class="help">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam sapien felis, lobortis id congue in, gravida sed nisl. Pellentesque pharetra ornare eros, </span>
+				</li>
+				<li>
+					<label>Note</label>
+					<input type="text" value="step % 4 + 35"></input>
+					<a href="#" class="presets">Presets...</a>
+					<span class="help">Etiam metus sem, aliquet viverra vehicula non, mollis vitae lacus. Maecenas eleifend orci vitae ipsum volutpat et sollicitudin dui tristique. Etiam sit amet sapien ac augue lacinia bibendum. </span>
+				</li>
+				<li>
+					<label>Volume</label>
+				</li>
 			</ul>
 			<br/>
-			<a ng-click="deleteBlock()">DELETE BLOCK</a><br/>
-			<a ng-click="deleteConnection()">DELETE CONNECTION</a><br/>
+			<a class="button" ng-click="deleteBlock()">DELETE BLOCK</a><br/>
+			<a class="button" ng-click="deleteConnection()">DELETE CONNECTION</a><br/>
 		</div>
 
 		<div ng-show="createBlockPanel">
-			<h3>Create</h3>
+
+			<header>
+				<h3>Create block or connection</h3>
+		<p>Donec non tempus massa. Sed ultricies, ante ut tincidunt viverra, magna enim tristique tellus, a laoreet ligula mauris sed ante. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Duis mollis, arcu nec ullamcorper iaculis, arcu purus pellentesque lacus, </p>
+					</header>
+
 			<ul class="createdevice">
 				<li>
 					<a ng-click="beginAddConnection()">
