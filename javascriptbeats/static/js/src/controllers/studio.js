@@ -1,5 +1,4 @@
 'use strict';
-console.log('in studio.js');
 
 var module = angular.module('app', []);
 
@@ -610,6 +609,7 @@ function BuzzController($scope, $http) {
  				console.log('connect from', id);
  				$scope.connectFrom = id;
  				$scope.state = 'create-connection-2';
+	   		_setHelp('Click the block to connect to');
  			}
  		} else if ($scope.state == 'create-connection-2') {
  			if (id != '' && id != $scope.connectFrom) {
@@ -617,6 +617,7 @@ function BuzzController($scope, $http) {
  				$scope.connectTo = id;
  				$scope.state = '';
 				$scope.connectBlocks($scope.connectFrom, $scope.connectTo);
+	   		_setHelp('');
  			}
  		} else {
   	 	$( 'ul.blocks li' ).removeClass('selected');
@@ -624,6 +625,9 @@ function BuzzController($scope, $http) {
 	   	if (id != '') {
   	 		$( 'ul.blocks li[data-id='+id+']' ).addClass('selected');
 	   		$( 'ul.connections li[data-id='+id+']' ).addClass('selected');
+	   		_setHelp('Shift click the second block to connect them, click delete to delete the selected object');
+	   	} else {
+	   		_setHelp('');
 	   	}
 			$scope.selected = id;
 			$scope.sidebarPanel = (id != '');
@@ -635,11 +639,13 @@ function BuzzController($scope, $http) {
 	$scope.beginAddSomething = function() {
 		$scope.setSelection('');
 		$scope.sidebarPanel = true;
+	 	_setHelp('');//Click the block to connect to');
 	}
 
 	$scope.beginAddBlock = function() {
 		$scope.setSelection('');
 		$scope.createBlockPanel = true;
+		_setHelp('Click the type of block you want to add');
 	}
 
 	$scope._deleteBlock = function(id) {
@@ -661,6 +667,15 @@ function BuzzController($scope, $http) {
 		}
 	}
 
+	$scope.helpvisible = false;
+	$scope.helptext = '';
+
+	var _setHelp = function(html) {
+		$scope.helphtml = html;
+	}
+
+	_setHelp('');
+
 	$scope.deleteBlock = function() {
 		var id = $scope.selected;
 		if (id == '')
@@ -669,6 +684,7 @@ function BuzzController($scope, $http) {
 		$scope.$apply();
 		_renderconnections();
 		_makeDraggable();
+		_setHelp('');
 	}
 
 	$scope._deleteConnection = function(id) {
@@ -689,6 +705,7 @@ function BuzzController($scope, $http) {
 		$scope.$apply();
 		_renderconnections();
 		_makeDraggable();
+		_setHelp('');
 	}
 
 	$scope.deleteConnection = function() {
@@ -699,12 +716,14 @@ function BuzzController($scope, $http) {
 		$scope.$apply();
 		_renderconnections();
 		_makeDraggable();
+		_setHelp('');
 	}
 
 	$scope.beginAddConnection = function() {
 		$scope.connectFrom = '';
 		$scope.connectTo = '';
 		$scope.setSelection('');
+		_setHelp('Click on the block you want to connect from...');
 		$scope.state = 'create-connection';
 		$scope.sidebarPanel = false;
 		$scope.createConnectionPanel = true;
@@ -719,12 +738,13 @@ function BuzzController($scope, $http) {
 	$scope.createBlock = function(type) {
 		var newid =	machine.generateId();
 		var idx = $scope.blocks.length;
+		var b = _getBounds();
 		$scope.blocks.push({
 			'id': 'block'+idx,
 			'type': type,
 			'index': idx,
-			'x': 0,
-			'y': 0
+			'x': b.x1-50,
+			'y': b.cy
 		});
 		$scope.createBlockPanel = false;
 		$scope.sidebarPanel = false;
@@ -753,13 +773,7 @@ function BuzzController($scope, $http) {
 		//$('.workspace .connections').show();
 	}
 
-	$scope.centerView = function() {
-		// center viewport. viewport
-		var ws = $(document);
-
-		var w = ws.width();
-		var h = ws.height();
-
+	var _getBounds = function() {
 		var b_x1 = 9999;
 		var b_x2 = -9999;
 		var b_y1 = 9999;
@@ -784,10 +798,29 @@ function BuzzController($scope, $http) {
 
 		console.log('block center', b_cx, b_cy);
 
+		return {
+			x1: b_x1,
+			x2: b_x2,
+			y1: b_y1,
+			y2: b_y2,
+			cx: b_cx,
+			cy: b_cy
+		}
+	}
+
+	$scope.centerView = function() {
+		// center viewport. viewport
+		var ws = $(document);
+
+		var w = ws.width();
+		var h = ws.height();
+
+		var bounds = _getBounds();
+
 		for (var i=0; i<_scope.blocks.length; i++) {
 			var b = _scope.blocks[i];
-			b.x -= b_cx;
-			b.y -= b_cy;
+			b.x -= bounds.cx;
+			b.y -= bounds.cy;
 			b.x += Math.floor(w * 0.4); // a little bit to the left
 			b.y += Math.floor(h * 0.5);
 		}
@@ -868,6 +901,7 @@ function BuzzController($scope, $http) {
    	});
    	_makeDraggable();
    	$scope.centerView();
+		_setHelp('');
 	}, 10);
 
 	$(window).keyup(function(event) {
