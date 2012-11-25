@@ -8,6 +8,8 @@ var BaseDevice = function() {
 	this.sendpin1 = null;
 	this.sendpin2 = null;
 	this.machine = null;
+	this.typeTitle = 'Unnamed device';
+	this.typeInfo = '';
 }
 
 BaseDevice.prototype.create = function(machine) {

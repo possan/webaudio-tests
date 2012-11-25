@@ -30,8 +30,7 @@ Track.prototype.release = function() {
 Track.prototype.step = function(state) {
 	if (this.silent)
 		return;
-
-	// console.log('Track step', state);
+	// console.log('Track step #'+this.id, state);
 	var ss = state.superstep;
 	// check gate, fire off sound, all values are now evaluated and ready...
 	for(var i=0; i<this.valueids.length; i++) {
@@ -47,15 +46,31 @@ Track.prototype.step = function(state) {
 }
 
 Track.prototype.setData = function(data) {
-	this.solo = data.solo || false;
-	this.mute = data.mute || false;
-	this.silent = data.silent || false;
-	this.title = data.title || '';
+	if (typeof(data.solo) !== 'undefined')
+		this.solo = data.solo || false;
+
+	if (typeof(data.mute) !== 'undefined')
+		this.mute = data.mute || false;
+
+	if (typeof(data.x) !== 'undefined')
+		this.x = data.x || 0;
+
+	if (typeof(data.y) !== 'undefined')
+		this.y = data.y || 0;
+
+	if (typeof(data.silent) !== 'undefined')
+		this.silent = data.silent || false;
+
+	if (data.title)
+		this.title = data.title;
+
 	for (var i=0; i<this.valueids.length; i++) {
 		var id = this.valueids[i];
-		var t = this.values[id];
-		var input = data[id] || '';
-		t.source.setExpression(input);
+		if (data[id]) {
+			var input = data[id] || '';
+			var t = this.values[id];
+			t.source.setExpression(input);
+		}
 	}
 }
 

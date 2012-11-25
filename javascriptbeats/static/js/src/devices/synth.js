@@ -1,13 +1,14 @@
 var SynthDevice = function() {
 	BaseDevice.apply(this);
 	this.mutable = true;
-	this.parameters.push({ id:'gate', type:'', substep: false });
-	this.parameters.push({ id:'note', type:'', substep: false });
-	this.parameters.push({ id:'cutoff', type:'', substep: true });
-	this.parameters.push({ id:'resonance', type:'', substep: true });
-	this.parameters.push({ id:'release', type:'', substep: false });
-	this.parameters.push({ id:'volume', type:'', substep: false });
-	this.parameters.push({ id:'waveform', type:'', substep: false });
+	this.typeTitle = 'Synthesizer';
+	this.parameters.push({ id:'gate', type:'gate', title:'Gate', substep: false });
+	this.parameters.push({ id:'note', type:'note', title:'Note', substep: false });
+	this.parameters.push({ id:'cutoff', type:'hz', title: 'Cutoff', substep: true });
+	this.parameters.push({ id:'resonance', type:'percent', title: 'Resonance', substep: true });
+	this.parameters.push({ id:'release', type:'ms-release', title: 'Release', substep: false });
+	this.parameters.push({ id:'volume', type:'volume', title: 'Volume', substep: false });
+	this.parameters.push({ id:'waveform', type:'waveform', title: 'Waveform', substep: false });
 };
 
 SynthDevice.prototype = new BaseDevice();
@@ -20,9 +21,12 @@ SynthDevice.prototype.create = function() {
 	this.filter.connect(this.outputpin);
 }
 
-SynthDevice.prototype.destroy = function() {};
+SynthDevice.prototype.destroy = function() {
+	this.outputpin.disconnect();
+};
 
 SynthDevice.prototype.update = function(track, state) {
+	// console.log('update synth #'+track.id, track, state);
 	if(track.values['cutoff'].updated) {
 	  this.filter.frequency.value = track.values['cutoff'].value;
 	  this.filter.Q.value = track.values['resonance'].value / 100.0;
@@ -33,8 +37,6 @@ SynthDevice.prototype.update = function(track, state) {
 		var freq = 440.0*Math.pow(2.0, (note-49.0)/12.0);
 		// console.log('note='+note+', freq='+freq);
 
-		// console.log('trigger synth.', t2, state);
-
 		var source = this.machine.context.createOscillator();
 		source.type = track.values['waveform'].value;
 		source.frequency.value = freq;
@@ -42,8 +44,8 @@ SynthDevice.prototype.update = function(track, state) {
 		var release = 1.0 * track.values['release'].value;
 
 		var gainNode = this.machine.context.createGainNode();
-  	gainNode.gain.setValueAtTime(track.values['volume'].value / 100.0, context.currentTime);
-    gainNode.gain.linearRampToValueAtTime(0.0, context.currentTime + release / 1000.0);
+  	gainNode.gain.setValueAtTime(track.values['volume'].value / 100.0, this.machine.context.currentTime);
+    gainNode.gain.linearRampToValueAtTime(0.0, this.machine.context.currentTime + release / 1000.0);
 		source.connect(gainNode);
 
 		gainNode.connect(this.filter);

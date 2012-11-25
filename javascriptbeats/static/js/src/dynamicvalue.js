@@ -6,6 +6,7 @@ function DynamicValue(defaultvalue, interval) {
 	this.lastexpression = '<INVALID>';
 	this.fun = null;
 	this.interval = interval;
+	this.setExpression(''+defaultvalue);
 }
 
 DynamicValue.prototype.setFixedValue = function(fix) {

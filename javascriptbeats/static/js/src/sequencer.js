@@ -73,6 +73,10 @@ Sequencer.prototype.togglePlay = function() {
 		this.play();
 }
 
+Sequencer.prototype.isPlaying = function() {
+	return this.started;
+}
+
 Sequencer.prototype.play = function() {
 	if (this.started)
 		return;

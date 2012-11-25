@@ -6,11 +6,32 @@
 	<link rel="stylesheet" href="/static/css/buzz.css" />
 	<link rel="stylesheet" href="/static/css/smoothness/jquery-ui-1.9.1.custom.css" />
 	<script>
-		window.appDocumentId = '';
-		window.appSessionId = '';
+		window.appSessionId = '{{ session }}';
+		window.appCanFork = '{{ can_fork }}';
+		window.appCanSave = '{{ can_save }}';
+		window.appCanCreate = '{{ can_create }}';
+		window.appDocumentId = '{{ document }}';
+		try {
+			window.appDocument = {{ data }};
+		} catch(e) {
+		}
+	</script>
+	<script type="text/javascript">
+
+	  var _gaq = _gaq || [];
+	  _gaq.push(['_setAccount', 'UA-36439525-1']);
+	  _gaq.push(['_trackPageview']);
+
+	  (function() {
+	    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	  })();
+
 	</script>
 
 	<script type="text/javascript" src="/static/js/lib/buffer-loader.js"></script>
+
 	<script type="text/javascript" src="/static/js/src/song.js"></script>
 	<script type="text/javascript" src="/static/js/src/mixer.js"></script>
 	<script type="text/javascript" src="/static/js/src/sampler.js"></script>
@@ -28,19 +49,6 @@
 
 	<script type="text/javascript" src="/static/js/lib/jquery-1.8.2.js"></script>
 	<script type="text/javascript" src="/static/js/lib/jquery-ui-1.9.1.custom.js"></script>
-
-	<xscript type="text/javascript" src="/static/js/lib/angular.js"></script>
-
-	<xscript type="text/javascript" src="/static/js/src/app.js"></xscript>
-	<xscript type="text/javascript" src="/static/js/src/controllers/help.js"></script>
-	<xscript type="text/javascript" src="/static/js/src/controllers/preset.js"></script>
-	<sxcript type="text/javascript" src="/static/js/src/controllers/device.js"></script>
-	<xscript type="text/javascript" src="/static/js/src/controllers/buzz.js"></script>
-	<xscript type="text/javascript" src="/static/js/src/bootstrap.js"></script>
-	<xscript type="text/javascript" src="/static/js/src/main.js"></script>
-
-
-
 
 	<script type="text/javascript" data-main="/static/js/src/main" src="/static/js/src/require.js"></script>
 

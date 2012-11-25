@@ -2,13 +2,14 @@
 
 function Sampler() {
 	this.buffers = [];
+	this.machine = null;
 	this.names = [];
 }
 
 Sampler.prototype.load = function(data) {
 	var self = this;
 	var b = new BufferLoader(
-		context,
+		this.machine.context,
 		data.map(function(item) { return item.url; }),
 		function(all) {
 			console.log('all loaded.', all);
