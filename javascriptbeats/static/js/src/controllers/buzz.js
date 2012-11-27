@@ -960,17 +960,16 @@ define( 'src/controllers/buzz',
 		}, 100);
 
 		$(window).keyup(function(event) {
-			// console.log('key up', event, event.keyCode);
-
-			if (event.keyCode == 32 && event.srcElement.tagName != 'INPUT') {
-				$scope.toolbarPlay();
-				event.preventDefault();
-				return false;
-			}
-
-			if (event.keyCode == 46) {
-				$scope.deleteBlockOrConnection();
-				_setSidebar('song');
+			if (event.srcElement.tagName != 'INPUT') {
+				if (event.keyCode == 32) {
+					$scope.toolbarPlay();
+					event.preventDefault();
+					return false;
+				}
+				if (event.keyCode == 46) {
+					$scope.deleteBlockOrConnection();
+					_setSidebar('song');
+				}
 			}
 
 			return false;
