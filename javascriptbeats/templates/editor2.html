@@ -16,19 +16,6 @@
 		} catch(e) {
 		}
 	</script>
-	<script type="text/javascript">
-
-	  var _gaq = _gaq || [];
-	  _gaq.push(['_setAccount', 'UA-36439525-1']);
-	  _gaq.push(['_trackPageview']);
-
-	  (function() {
-	    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-	    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-	  })();
-
-	</script>
 
 	<script type="text/javascript" src="/static/js/lib/buffer-loader.js"></script>
 
@@ -65,12 +52,12 @@
 	<div class="workspace">
 		<canvas id="arrows" width="500" height="300"></canvas>
 		<ul id="connections" class="connections">
-			<li ng-repeat="c in connections" ng-style="getConnectionPosition(c)" data-id="{{c.id}}" data-index="{{c.index}}"></li>
+			<li ng-repeat="c in connections" ng-style="getConnectionPosition(c)" data-id="{{'{{c.id}}'}}" data-index="{{'{{c.index}}'}}"></li>
 		</ul>
 		<ul id="blocks" class="blocks">
-			<li ng-repeat="b in blocks" ng-style="getBlockPosition(b)" data-id="{{b.id}}" data-index="{{b.index}}">
-				<img ng-src="/static/img/device_{{b.type}}_40.png" />
-				<span>{{b.title}}</span>
+			<li ng-repeat="b in blocks" ng-style="getBlockPosition(b)" data-id="{{'{{b.id}}'}}" data-index="{{'{{b.index}}'}}">
+				<img ng-src="/static/img/device_{{'{{b.type}}'}}_40.png" />
+				<span>{{'{{b.title}}'}}</span>
  			</li>
 		</ul>
 	</div>
@@ -94,20 +81,18 @@
 				</a>
 			</li>
 			<li>
-				<a ng-click="toolbarSong()" class="button">
-					TEMPO
-				</a>
-			</li>
-			<li>
 				<a ng-click="toolbarCenter()" class="button">
 					CENTER
 				</a>
 			</li>
 			<li class="button">
-				<a ng-click="toolbarSave()" class="button">
+				<a ng-click="toolbarCreate()" ng-show="can_create" class="button">
 					SAVE
 				</a>
-				<a ng-click="toolbarFork()" class="button">
+				<a ng-click="toolbarSave()" ng-show="can_save" class="button">
+					SAVE
+				</a>
+				<a ng-click="toolbarFork()" ng-show="can_fork" class="button">
 					FORK
 				</a>
 			</li>
@@ -137,6 +122,7 @@
 			<p>
 				In your expressions you have access to the following parameters:<br/>
 			</p>
+			<h4>Variables</h4>
 			<p>
 				<B>step</b> - position in song, in sequencer steps, an bar of 4/4 beat contains 16 steps
 			</p>
@@ -145,6 +131,10 @@
 			</p>
 			<p>
 				<B>substep</b> - same as step, but with 128 steps per bar
+			</p>
+			<h4>Keyboard shortcuts</h4>
+			<p>
+				delete items by selecting them and clicking delete (NOT backspace) - Connect two devices quickly by first selecting the first device, then shift-clicking on the device to connect it to.
 			</p>
 		</div>
 
@@ -156,21 +146,22 @@
 				After fiddling around with web audio for some time realising how powerful it is, as a long time user/programmer of modular synthesizer software / virtual studio software, maxmsp, reason, jeskola buzz etc. i knew i had to make something like this.
 			</p>
 			<p>
-				Give me a shout on twitter if you like it! <a href="http://twitter.com/possan">@possan</a>
+				This is the first reincarnation of this so things are probably a bit flaky at times, and dont get me started on the icons :), code and page loads are not optimized at all right now, and more devices, filters and features can be created and are planned...
 			</p>
 			<p>
+				Give me a shout if you like it! <a href="http://twitter.com/possan" target="_blank">@possan</a>
 			</p>
 			<p>
 				Powered by angularjs, jquery-ui, buffer-loader, requirejs and samples from freesound.org
 			</p>
 			<p>
-				Version 0.1 (2012-11-25)
+				Version 0.2 (2012-11-27)
 			</p>
 		</div>
 
 		<div id="about" ng-show="aboutPanel">
 			<p>
-				javascriptbeats is a Chrome Web Audio Experiment by <a href="http://twitter.com/possan">@possan</a> - it's code is available on <a href="https://github.com/possan/webaudio-tests">github</a>
+				javascriptbeats is a Chrome Web Audio Experiment by <a href="http://twitter.com/possan" target="_blank">@possan</a> - it's code is available on <a href="https://github.com/possan/webaudio-tests" target="_blank">github</a>
 			</p>
 			<ul class="sharing">
 				<li>
@@ -185,23 +176,26 @@
 
 		<div ng-show="editParametersPanel">
 			<header>
-				<h3>{{propertyeditor.title}}</h3>
-				<p>{{propertyeditor.info}}</p>
+				<h3>{{'{{propertyeditor.title}}'}}</h3>
+				<p>{{'{{propertyeditor.info}}'}}</p>
 			</header>
 			<ul class="params">
 				<li ng-repeat="prop in propertyeditor.properties">
-					<label>{{prop.title}}</label>
+					<label>{{'{{prop.title}}'}}</label>
 					<input
 						type="text"
 						ng-model="prop.expression"
 						ng-change="savePropertyEditor($event,prop.name);"></input>
-					<a href="#"
+					<a
 						ng-show="prop.has_presets"
 						class="presets"
 						ng-click="showPresets($event,prop.index,prop.type)">Presets</a>
-					<span class="help">{{prop.help}}</span>
+					<span class="help">{{'{{prop.help}}'}}</span>
 				</li>
 			</ul>
+			<p ng-show="propertyeditor.properties.length == 0">
+				This device has no editable properties.
+			</p>
 			<br/>
 			<p ng-show="propertyeditor.deletable">
 				<a class="button" ng-click="deleteBlockOrConnection()">DELETE</a><br/>
@@ -209,24 +203,26 @@
 		</div>
 
 		<div id="sharePanel" ng-show="sharePanel">
-			<h3>Share song</h3>
-			<p>
-				Share this song:<br/>
-				<input type="text" class="white" id="myurl"></input>
-			</p>
-			<p>
-				<a id="shareTwitter">Share on Twitter</a>
-			</p>
-			<p>
-				<a id="shareFacebook">Post to Facebook</a>
-			</p>
-		</div>
+			<div ng-show="can_share">
+				<h4>Share song</h4>
+				<p>
+					Send this link to your friends:<br/>
+					<input type="text" class="white" id="myurl"></input>
+				</p>
+				<p>
+					<a id="shareTwitter" target="_blank">Share on Twitter</a>
+				</p>
+				<p>
+					<a id="shareFacebook" target="_blank">Post to Facebook</a>
+				</p>
+			</div>
 
-		<div id="sharePanel2" ng-show="sharePanel2">
-			<h3>Share song</h3>
-			<p>
-				Save your song first, then you can share it.
-			</p>
+			<div ng-hide="can_share">
+				<h4>Share song</h4>
+				<p>
+					Save your song first, then you can share it.
+				</p>
+			</div>
 		</div>
 
 		<div ng-show="createBlockPanel">
@@ -242,8 +238,8 @@
 				</li>
 				<li ng-repeat="dev in availableDevices">
 					<a ng-click="createBlock(dev.type)">
-						<img ng-src="/static/img/device_{{dev.type}}_40.png" />
-						<span>{{dev.title}}</span>
+						<img ng-src="/static/img/device_{{'{{dev.type}}'}}_40.png" />
+						<span>{{'{{dev.title}}'}}</span>
 					</a>
 				</li>
 			</ul>
@@ -259,5 +255,20 @@
 	  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=470937449625186";
 	  fjs.parentNode.insertBefore(js, fjs);
 	}(document, 'script', 'facebook-jssdk'));</script>
+
+
+	<script type="text/javascript">
+
+	  var _gaq = _gaq || [];
+	  _gaq.push(['_setAccount', 'UA-36439525-1']);
+	  _gaq.push(['_trackPageview']);
+
+	  (function() {
+	    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	  })();
+
+	</script>
 </body>
 </html>

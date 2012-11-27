@@ -2,11 +2,11 @@ var SamplerDevice = function() {
 	BaseDevice.apply(this);
 	this.mutable = true;
 	this.typeTitle = 'Sampler';
-	this.parameters.push({ id:'gate', type:'gate', title: 'Gate', substep: false });
-	this.parameters.push({ id:'volume', type:'volume', title: 'Volume', substep: false });
-	this.parameters.push({ id:'speed', type:'playbackspeed', title: 'Playback speed', substep: false });
-	this.parameters.push({ id:'sample', type:'sample', title: 'Sample number', substep: false });
-	this.parameters.push({ id:'release', type:'ms-release', title: 'Release', substep: false });
+	this.parameters.push({ id:'gate', type:'gate', title: 'Gate', substep: false, default: '0' });
+	this.parameters.push({ id:'volume', type:'volume', title: 'Volume', substep: false, default: '100' });
+	this.parameters.push({ id:'speed', type:'playbackspeed', title: 'Playback speed', substep: false, default: '100' });
+	this.parameters.push({ id:'sample', type:'sample', title: 'Sample number', substep: false, default: '0' });
+	this.parameters.push({ id:'release', type:'ms-release', title: 'Release', substep: false, default: '2000' });
 };
 
 SamplerDevice.prototype = new BaseDevice();

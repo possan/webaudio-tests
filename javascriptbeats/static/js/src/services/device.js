@@ -8,10 +8,10 @@ define('src/services/device', ['src/app'], function(app) {
 				{ type: 'synth', title: 'Synthesizer' },
 				{ type: 'sampler', title: 'Sampler' },
 				{ type: 'delay', title: 'Delay' },
-				{ type: 'reverb', title: 'Reverb' },
-				{ type: 'waveshaper', title: 'Waveshaper' },
-				{ type: 'filter', title: 'Filter' },
-				{ type: 'compressor', title: 'Compressor' },
+			//	{ type: 'reverb', title: 'Reverb' },
+			//	{ type: 'waveshaper', title: 'Waveshaper' },
+			//	{ type: 'filter', title: 'Filter' },
+			//	{ type: 'compressor', title: 'Compressor' },
 			];
 		}
 

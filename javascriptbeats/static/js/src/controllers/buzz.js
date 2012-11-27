@@ -33,6 +33,12 @@ define( 'src/controllers/buzz',
 		$scope.createBlockPanel = false;
 		$scope.helpPanel = false;
 
+		$scope.id = window.appDocumentId;
+		$scope.can_save = window.appCanSave;
+		$scope.can_fork = window.appCanFork;
+		$scope.can_share = window.appCanSave || window.appCanFork;
+		$scope.can_create = window.appCanCreate;
+
 		var _renderconnections = function() {
 			if (!_linesVisible)
 				return;
@@ -89,8 +95,8 @@ define( 'src/controllers/buzz',
 			$( 'ul.blocks li' ).unbind('click');
 			$( 'ul.connections li' ).unbind('click');
 			$( 'ul.blocks li' ).bind('contextmenu', function(event) {
-				console.log('mousedown', this, event);
-				console.log('right clicked.');
+				// console.log('mousedown', this, event);
+				// console.log('right clicked.');
 				event.preventDefault();
 				event.stopPropagation();
 				$scope.setSelection(this.dataset.id);	
@@ -101,7 +107,7 @@ define( 'src/controllers/buzz',
 				event.stopPropagation();
 				if (!$(this).hasClass('dragging')) {
 					event.preventDefault();
-					console.log('clicked block 2', this, event);
+					// console.log('clicked block 2', this, event);
 					if ($scope.selected != this.dataset.id) {
 						if ($scope.selected != '' && (event.shiftKey || event.altKey)) {
 							// connect block shortcut, select one, shift-click the destination..
@@ -117,8 +123,8 @@ define( 'src/controllers/buzz',
 				}
 			});
 			$( 'ul.connections li' ).bind('contextmenu', function(event) {
-				console.log('mousedown', this, event);
-				console.log('right clicked.');
+				// console.log('mousedown', this, event);
+				// console.log('right clicked.');
 				event.preventDefault();
 				event.stopPropagation();
 				$scope.setSelection(this.dataset.id);
@@ -128,7 +134,7 @@ define( 'src/controllers/buzz',
 			$( 'ul.connections li' ).click(function(event) {
 				event.preventDefault();
 				event.stopPropagation();
-				console.log('clicked connection 2', this);
+				// console.log('clicked connection 2', this);
 				if ($scope.selected != this.dataset.id) {
 					$scope.setSelection(this.dataset.id);
 				} else {
@@ -144,7 +150,7 @@ define( 'src/controllers/buzz',
 				start: function() {
 					// hide canvas
 					$(this).addClass('dragging');
-					console.log('start drag', this);
+					// console.log('start drag', this);
 					_hidelines();
 				},
 				drag: function() {
@@ -237,18 +243,18 @@ define( 'src/controllers/buzz',
 		}
 
 		$scope.showPresets = function(e, index, type) {
-			console.log('showPresets');
-			console.log('e', e);
-			console.log('type', type);
-			console.log('index', index);
+			// console.log('showPresets');
+			// console.log('e', e);
+			// console.log('type', type);
+			// console.log('index', index);
 			var pres = helpService.getParameterPresets(type);
 			popupmenu.show({
 				x: event.pageX,
 				y: event.pageY,
 				callback: function(_item) {
-					console.log('clicked preset', _item);
-					console.log('old prop', $scope.propertyeditor.properties[index]);
-					console.log('set value', _item.expression);
+					// console.log('clicked preset', _item);
+					// console.log('old prop', $scope.propertyeditor.properties[index]);
+					// console.log('set value', _item.expression);
 					$scope.propertyeditor.properties[index].expression = _item.expression;
 					$scope.$apply();
 					$scope.savePropertyEditor();
@@ -260,13 +266,14 @@ define( 'src/controllers/buzz',
 		var _showBlockPopupMenu = function(event, id) {
 			var items = [{
 				id: '0',
-				title: 'Delete block'
+				title: 'Delete'
 			}];
 			popupmenu.show({
 				x: event.pageX,
 				y: event.pageY,
 				callback: function(item) {
-					console.log('clicked block popup menu item', item);
+					// console.log('clicked block popup menu item', item);
+					$scope.deleteBlockOrConnection(id);
 				},
 				items: items
 			});
@@ -443,7 +450,25 @@ define( 'src/controllers/buzz',
 		$scope.toolbarSong = function() {
 		}
 
+		$scope.toolbarCreate = function() {
+			var dataset_json = JSON.stringify(machine.getData(), undefined, 2);
+			var cfg = { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'} };
+			var data = 'data='+encodeURIComponent(dataset_json);
+	    $http.post('/blob', data, cfg).success(function (data) {
+	      console.log('post result', data);
+	      if (data.success) {
+	      	location = data.url;
+	      }
+	    });
+		}
+
 		$scope.toolbarSave = function() {
+			var dataset_json = JSON.stringify(machine.getData(), undefined, 2);
+			var cfg = { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'} };
+			var data = 'data='+encodeURIComponent(dataset_json);
+	    $http.post('/blob/'+$scope.id+'/save', data, cfg).success(function (data) {
+	      console.log('post result', data);
+	    });
 		}
 
 		$scope.toolbarPlay = function() {
@@ -455,7 +480,16 @@ define( 'src/controllers/buzz',
 		}
 
 		$scope.toolbarFork = function() {
-		}
+			var dataset_json = JSON.stringify(machine.getData(), undefined, 2);
+			var cfg = { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'} };
+			var data = 'data='+encodeURIComponent(dataset_json);
+	    $http.post('/blob/'+$scope.id+'/fork', data, cfg).success(function (data) {
+	      console.log('post result', data);
+	      if (data.success) {
+	      	location = data.url;
+	      }
+	    });
+	}
 
 		$scope.toolbarHelp = function() {
 			_setSidebar('help');
@@ -478,7 +512,9 @@ define( 'src/controllers/buzz',
 			var id = $scope.selected;
 			if (id == '')
 				return;
-			editorService.deleteBlock(id);
+			var b = editorService.getBlockById(id)
+			if (b)
+				editorService.deleteBlock(id);
 			_reloadView();
 			_setSidebar('song');
 			_makeDraggable();
@@ -489,8 +525,12 @@ define( 'src/controllers/buzz',
 			var id = $scope.selected;
 			if (id == '')
 				return;
-			editorService.deleteBlock(id);
-			editorService.deleteConnection(id);
+			var b = editorService.getBlockById(id)
+			if (b)
+				editorService.deleteBlock(id);
+			var c = editorService.getConnectionById(id)
+			if (c)
+				editorService.deleteConnection(id);
 			_setSidebar('song');
 			_reloadView();
 			_makeDraggable();
@@ -501,7 +541,9 @@ define( 'src/controllers/buzz',
 			var id = $scope.selected;
 			if (id == '')
 				return;
-			editorService.deleteConnection(id);
+			var c = editorService.getConnectionById(id)
+			if (c)
+				editorService.deleteConnection(id);
 			$scope.editParametersPanel = false;
 			_reloadView();
 			_setSidebar('song');
@@ -612,10 +654,263 @@ define( 'src/controllers/buzz',
 
 		var _linesVisible = true;
 
+		var _setDoc = function(doc) {
+		  machine.reset();
+		 	machine.setData(doc);
+		 	_reloadView();
+		 	$scope.toolbarCenter();
+		}
+
+		var _resetDoc = function() {
+		 	console.log('reset doc.');
+		 	var doc =
+{
+  "bpm": "120",
+  "shuffle": "33",
+  "title": "hejsan",
+  "tracks": [
+    {
+      "id": "device1",
+      "x": 572,
+      "y": 207,
+      "type": "synth",
+      "title": "Bass",
+      "solo": false,
+      "mute": false,
+      "silent": false,
+      "gate": "1",
+      "note": "[12,3,48,26][(step>>0)%4]+[3,3,2,1,0,0,12,0][(step>>3)%8]",
+      "cutoff": "900 + 300 * Math.sin(time*5)",
+      "resonance": "2",
+      "release": "150",
+      "volume": "50",
+      "waveform": "1"
+    },
+    {
+      "id": "master",
+      "x": 465,
+      "y": 369,
+      "type": "master",
+      "title": "Master",
+      "solo": false,
+      "mute": false,
+      "silent": false
+    },
+    {
+      "id": "_1431762",
+      "x": 423,
+      "y": 135,
+      "type": "delay",
+      "silent": false,
+      "delaytime": "75",
+      "delayfeedback": "80"
+    },
+    {
+      "id": "_1700835",
+      "x": 226,
+      "y": 181,
+      "type": "sampler",
+      "title": "Drums",
+      "silent": false,
+      "gate": "1",
+      "volume": "100",
+      "speed": "100",
+      "sample": "[0,99,2,99,1,99,2,99,0,99,2,99,1,3,2,1][step%16]",
+      "release": "500"
+    },
+    {
+      "id": "_4263005",
+      "x": 139,
+      "y": 287,
+      "type": "sampler",
+      "silent": false,
+      "gate": "(step % 4) == 0",
+      "volume": "100",
+      "speed": "100",
+      "sample": "4",
+      "release": "2000"
+    },
+    {
+      "id": "_5412635",
+      "x": 764.5,
+      "y": 229.5,
+      "type": "synth",
+      "silent": false,
+      "gate": "1",
+      "note": "Math.round(Math.random()*4)*12 + 12",
+      "cutoff": "1000",
+      "resonance": "0",
+      "release": "150",
+      "volume": "100",
+      "waveform": "1"
+    },
+    {
+      "id": "_4945851",
+      "x": 658,
+      "y": 336,
+      "type": "delay",
+      "silent": false,
+      "delaytime": "0.6 + 0.4 * Math.sin(time * 3)",
+      "delayfeedback": "70"
+    }
+  ],
+  "connections": [
+    {
+      "id": "_03",
+      "from": "device2",
+      "to": "bus1",
+      "amount": "33"
+    },
+    {
+      "id": "_04",
+      "from": "device2",
+      "to": "bus2",
+      "amount": "33"
+    },
+    {
+      "id": "_05",
+      "from": "device2",
+      "to": "master",
+      "amount": "100"
+    },
+    {
+      "id": "_06",
+      "from": "device1",
+      "to": "delay1",
+      "amount": "100"
+    },
+    {
+      "id": "_07",
+      "from": "delay1",
+      "to": "master",
+      "amount": "100"
+    },
+    {
+      "id": "_08",
+      "from": "delay1",
+      "to": "bus1",
+      "amount": "50"
+    },
+    {
+      "id": "_09",
+      "from": "delay1",
+      "to": "bus2",
+      "amount": "50"
+    },
+    {
+      "id": "_18",
+      "from": "bus1",
+      "to": "master",
+      "amount": "50"
+    },
+    {
+      "id": "_19",
+      "from": "bus2",
+      "to": "master",
+      "amount": "50"
+    },
+    {
+      "id": "_9745937",
+      "from": "_314837",
+      "to": "bus1",
+      "amount": "50"
+    },
+    {
+      "id": "_6392379",
+      "from": "_314837",
+      "to": "_2938316",
+      "amount": "100"
+    },
+    {
+      "id": "_4041531",
+      "from": "_2938316",
+      "to": "master",
+      "amount": "100"
+    },
+    {
+      "id": "_2966674",
+      "from": "device1",
+      "to": "master",
+      "amount": "150"
+    },
+    {
+      "id": "_1065266",
+      "from": "_314837",
+      "to": "master",
+      "amount": "100"
+    },
+    {
+      "id": "_1998373",
+      "from": "device1",
+      "to": "_1431762",
+      "amount": "100"
+    },
+    {
+      "id": "_7225975",
+      "from": "_1431762",
+      "to": "master",
+      "amount": "25"
+    },
+    {
+      "id": "_8568805",
+      "from": "_1700835",
+      "to": "master",
+      "amount": "250"
+    },
+    {
+      "id": "_1712554",
+      "from": "_4263005",
+      "to": "master",
+      "amount": "350"
+    },
+    {
+      "id": "_2652703",
+      "from": "_5412635",
+      "to": "_4945851",
+      "amount": "100"
+    },
+    {
+      "id": "_603196",
+      "from": "_4945851",
+      "to": "master",
+      "amount": "100"
+    },
+    {
+      "id": "_9222609",
+      "from": "_1700835",
+      "to": "_1431762",
+      "amount": "100"
+    }
+  ]
+}
+;
+			_setDoc(doc);
+		}
 
 		setTimeout(function() {
+
 			// load blocks...
 			editorService.init();
+
+			if (window.appDocument) {
+			  try {
+			    var data = window.appDocument;
+			    if (data) {
+			    	console.log('load json doc.');
+			    	_setDoc(data);
+					} else {
+				  	_resetDoc();
+					}
+			  } catch (e) {
+			  	_resetDoc();
+			  }
+			}
+			else {
+			 	_resetDoc();
+			}
+
+
+
 			_reloadView();
 			_renderconnections();
 
@@ -626,7 +921,7 @@ define( 'src/controllers/buzz',
 			});
 
 			$( '.workspace' ).click(function(b) {
-				console.log('clicked workspace', b, b.target);
+				// console.log('clicked workspace', b, b.target);
 				popupmenu.hide();
 				if (b.target.className === 'workspace' ||
 					b.target.tagName === 'CANVAS') {
@@ -643,11 +938,9 @@ define( 'src/controllers/buzz',
 
 			$scope.toolbarCenter();
 
-			_setSidebar('song');
-
 			_setHelp('');
 
-			var myurl = 'http://javascriptbeats.appspot.com/123456';
+			var myurl = 'http://javascriptbeats.appspot.com/'+$scope.id;
 			var sharetext = 'Look what i did with #javascriptbeats';
 			$('#myurl').val(myurl);
 			$('#shareTwitter').attr('href', 'http://twitter.com/share?text='+encodeURIComponent(sharetext)+'&url='+encodeURIComponent(myurl));
@@ -655,10 +948,15 @@ define( 'src/controllers/buzz',
 
 			//	$scope.setSelection('block1');
 			$('#bigloadah').fadeOut();
+
+			$scope.setSelection('');
+			$scope.$apply();
+			_setSidebar('song');
+
 		}, 100);
 
 		$(window).keyup(function(event) {
-			console.log('key up', event, event.keyCode);
+			// console.log('key up', event, event.keyCode);
 
 			if (event.keyCode == 32 && event.srcElement.tagName != 'INPUT') {
 				$scope.toolbarPlay();

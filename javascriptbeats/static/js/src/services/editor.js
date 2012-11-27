@@ -78,53 +78,6 @@ define('src/services/editor', ['src/app'], function(app) {
 			app.machine.removeConnection(id);
 		}
 
-
-
-
-
-		var _lastid = '';
-
-		this.getBlockProperties = function(id) {
-			_lastid = id;
-			return [
-				{
-					id: 'title',
-					title: 'Title',
-					value: 'xyz'
-				},
-				{
-					id: 'gate',
-					title: 'Gate',
-					helptext: 'help text 2',
-					value: 'zzz'
-				},
-				{
-					id: 'volume',
-					title: 'Volume',
-					help: 'helptext3',
-					value: 'www'
-				},
-			]
-		}
-
-		this.getConnecitonProperties = function(id) {
-			_lastid = id;
-			return [
-				{
-					id: 'volume',
-					title: 'Volume',
-					value: '100'
-				},
-			]
-		}
-
-
-
-
-		this.updateProperties = function(data) {
-			console.log( 'update properties', _lastid, data );
-		}
-
 		this.getDeviceTypeParameterDefinition = function(type) {
 			if (type == 'connection') {
 				var d = new Connection();
@@ -133,21 +86,6 @@ define('src/services/editor', ['src/app'], function(app) {
 			var d = app.machine.createDeviceByType(type);
 			return d.parameters;
 		}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	});
 });

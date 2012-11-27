@@ -19,7 +19,7 @@ DynamicValue.prototype.getFixedValue = function() {
 }
 
 DynamicValue.prototype.setExpression = function(expr) {
-	this.expression = (expr || '').trim();
+	this.expression = (''+(expr || '')).trim();
 	if (this.expression == this.lastexpression) return;
 	// console.log('Trying to compile: '+this.expression);
 	this.fun = null;

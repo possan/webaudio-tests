@@ -6,6 +6,7 @@ body {
 	padding: 0;
 	margin: 0;
 	overflow: hidden;
+	font-size: 9pt;
 }
 
 h1 {
@@ -129,10 +130,16 @@ ul.connections li {
 .sidebar h3 {
 	color: #fff;
 	font-size: 170%;
-	margin: 0 0 15px 0;
+	margin: 0 0 10px 0;
 	padding: 0;
 }
 
+.sidebar h4 {
+	color: #fff;
+	font-size: 140%;
+	margin: 0 0 10px 0;
+	padding: 0;
+}
 
 
 
@@ -147,6 +154,7 @@ ul.connections li {
 	left: 	0px;
 	height: 30px;
 	width: 100%;
+	font-size: 90%;
 	background-color: #444;
 	background: #444; /* Old browsers */
 	background: -moz-linear-gradient(top, #555 0%, #333 100%); /* FF3.6+ */
@@ -298,8 +306,8 @@ ul.params li label {
 	display: block;
 	font-size: 110%;
 	padding-bottom: 0px;
-	border-bottom: 1px solid #888;
-	margin-bottom: 2px;
+	border-bottom: 0;
+	margin-bottom: 1px;
 }
 
 ul.params li a.presets {
@@ -337,7 +345,7 @@ ul.params li span.help {
 }
 
 ul.params li:hover span.help {
-	height: 50px;
+	height: 35px;
 }
 
 .sidebar header {
@@ -436,6 +444,7 @@ ul.sharing li {
 	position: absolute;
 	bottom: 0px;
 	width: 250px;
+	font-size: 90%;
 }
 
 input.white {

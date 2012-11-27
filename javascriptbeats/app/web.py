@@ -41,7 +41,7 @@ def get_user_cookie(handler):
 class NewDocHandler(webapp2.RequestHandler, BasePage):
   def get(self):
     sessionid = get_user_cookie(self)
-    self.render('templates/editor.html', {
+    self.render('templates/editor2.html', {
         'session': sessionid,
         'document': '',
         'owner': sessionid,
@@ -57,7 +57,7 @@ class OldDocHandler(webapp2.RequestHandler, BasePage):
   def get(self, blobid):
     sessionid = get_user_cookie(self)
     doc = BlobHelper.load(blobid)
-    self.render('templates/editor.html', {
+    self.render('templates/editor2.html', {
         'session': sessionid,
         'document': blobid,
         'owner': doc['owner'],

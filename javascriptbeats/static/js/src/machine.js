@@ -154,6 +154,8 @@ Machine.prototype.getData = function() {
 		var trk = m.getTrackById(id);
 		var newtrk = {};
 		newtrk.id = trk.id;
+		newtrk.x = trk.x;
+		newtrk.y = trk.y;
 		newtrk.type = trk.type;
 		newtrk.title = trk.title;
 		newtrk.solo = trk.solo;
@@ -201,24 +203,8 @@ Machine.prototype.addDevice = function(type) {
 		this.devicemap[newid] = newdevice;
 		this.tracks.push(newid);
 		this.trackmap[newid] = newtrack;
-		console.log('created ', newdevice, newtrack);
 	}
 
-	/*
-	var d = {
-		id: newid,
-		type: type,
-		title: 'New '+type
-	};
-	d._device = this.createDeviceByType(type);
-	d._device.machine = this;
-	d._device.create();
-	d._track = new Track();
-	addDefaultValueTracks(d._device, d._track, d);
-	d._track.silent = false;
-	this.devicemap[newid] = d;
-	this.devices.push(newid);
-	*/
 	return newid;
 }
 
@@ -261,6 +247,20 @@ Machine.prototype.connectDevices = function(fromid, toid) {
 	return newid;
 }
 
+Machine.prototype._reconnectEverything = function() {
+	for (var i=0; i<this.numConnections(); i++) {
+		var id = this.getConnectionId(i);
+		var conn = this.getConnectionById(id);
+		conn.release();
+	}
+	for (var i=0; i<this.numConnections(); i++) {
+		var id = this.getConnectionId(i);
+		var conn = this.getConnectionById(id);
+		conn.setData({ _forcereconnect: true });
+	}
+}
+
+
 Machine.prototype.disconnectDevice = function(deviceid) {
 	var conns = [];
 	for (var i=0; i<this.connections.length; i++) {
@@ -273,6 +273,7 @@ Machine.prototype.disconnectDevice = function(deviceid) {
 }
 
 Machine.prototype.removeConnection = function(id) {
+	console.log('remove connection', id);
 	var idx = this.connections.indexOf(id);
 	if (idx != -1)
 		this.connections.splice(idx, 1);
@@ -280,6 +281,7 @@ Machine.prototype.removeConnection = function(id) {
 		this.connectionmap[id].release();
 		delete this.connectionmap[id];
 	}
+	this._reconnectEverything();
 	return true;
 }
 
@@ -441,7 +443,7 @@ Machine.prototype.setData = function(data) {
 		for (var i=0; i<this.numConnections(); i++) {
 			var id = this.getConnectionId(i);
 			if (dataconnectionids.indexOf(id) == -1 ) {
-				console.log('remove connection', id);
+				// console.log('remove connection', id);
 				// previously created track not in new list of tracks...
 				this.removeConnection(id);
 				// removeconnections.push(id);
@@ -451,7 +453,7 @@ Machine.prototype.setData = function(data) {
 		for (var i=0; i<this.numTracks(); i++) {
 			var id = this.getTrackId(i);
 			if (datatrackids.indexOf(id) == -1 ) {
-				console.log('remove track', id);
+				// console.log('remove track', id);
 				// previously created track not in new list of tracks...
 				var oldtrack = this.getTrackById(id);
 				if (oldtrack)
@@ -469,7 +471,7 @@ Machine.prototype.setData = function(data) {
 		for (var i=0; i<datatrackids.length; i++) {
 			var id = datatrackids[i];
 			if (!this.deviceExists(id) && !this.trackExists(id)) {
-				console.log('new track', id);
+				// console.log('new track', id);
 				var intrack = datatracks[id];
 				newdevices.push(dataconnections[id]);
 				newtracks.push(datatracks[id]);
@@ -487,14 +489,14 @@ Machine.prototype.setData = function(data) {
 					this.devicemap[id] = newdevice;
 					this.tracks.push(id);
 					this.trackmap[id] = newtrack;
-					console.log('created ', newdevice, newtrack, intrack);
+					// console.log('created ', newdevice, newtrack, intrack);
 				}
 			}
 		}
 		// adda nya connections
 		for (var i=0; i<dataconnectionids.length; i++) {
 			var id = dataconnectionids[i];
-			console.log('ensure connection', id);
+			// console.log('ensure connection', id);
 			if (!this.connectionExists(id)) {
 				this.connections.push(id);
 				var c = new Connection();

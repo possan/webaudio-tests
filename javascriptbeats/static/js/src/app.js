@@ -22,7 +22,7 @@ define('src/app', ['lib/angular'], function(angularPlaceholder) {
 		{ url: '/static/audio/808kick1.mp3', name: '808 Kick 2' }
 	]);
 
-
+	/*
 	var _setDoc = function(doc) {
 	  app.machine.reset();
 	 	app.machine.setData(doc);
@@ -217,6 +217,7 @@ define('src/app', ['lib/angular'], function(angularPlaceholder) {
 	};
 
 	_resetDoc();
+	*/
   app.bootstrap = function() {
   	angular.bootstrap(document, ['app']);
 	}

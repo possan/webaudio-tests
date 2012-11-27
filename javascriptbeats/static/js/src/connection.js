@@ -37,9 +37,12 @@ Connection.prototype.addValue = function(value, id, speedy) {
 
 Connection.prototype.release = function() {
 	var fromdevice = this.machine.getDeviceById(this.from);
-	if (fromdevice) {
+	console.log('fromdevice', fromdevice);
+	if (fromdevice && this.gainnode) {
+		// disconnect all, reconnect later.
 		fromdevice.outputpin.disconnect();
 	}
+	console.log('gainnode', this.gainnode);
 	if (this.gainnode) {
 		this.gainnode.disconnect();
 		delete(this.gainnode);
@@ -86,7 +89,8 @@ Connection.prototype.setData = function(data) {
 	}
 
 	if (this.from != this.lastfrom ||
-		this.to != this.lastto) {
+		this.to != this.lastto ||
+		data._forcereconnect) {
 		console.log('recreate connection.', this.from, this.to, this.gainnode);
 		if (this.gainnode) {
 			this.gainnode.disconnect();
@@ -95,11 +99,11 @@ Connection.prototype.setData = function(data) {
 		}
 		var fromdevice = this.machine.getDeviceById(this.from);
 		var todevice = this.machine.getDeviceById(this.to);
-		console.log('devices', fromdevice, todevice);
+		// console.log('devices', fromdevice, todevice);
 		if (fromdevice && todevice) {
-			console.log('pins', fromdevice.outputpin, todevice.inputpin);
+			// console.log('pins', fromdevice.outputpin, todevice.inputpin);
 			if (fromdevice.outputpin && todevice.inputpin) {
-				console.log('all ok, connect!');
+				// console.log('all ok, connect!');
 				this.gainnode = this.machine.context.createGainNode();
 				// var amt = this.values['amount'];
 				// this.gainnode.gain.value = amt.value / 100.0;
