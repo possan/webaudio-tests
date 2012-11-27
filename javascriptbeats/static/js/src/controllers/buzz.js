@@ -93,7 +93,9 @@ define( 'src/controllers/buzz',
 
 		var _makeDraggable = function() {
 			$( 'ul.blocks li' ).unbind('click');
+			$( 'ul.blocks li' ).unbind('contextmenu');
 			$( 'ul.connections li' ).unbind('click');
+			$( 'ul.connections li' ).unbind('contextmenu');
 			$( 'ul.blocks li' ).bind('contextmenu', function(event) {
 				// console.log('mousedown', this, event);
 				// console.log('right clicked.');
@@ -266,15 +268,15 @@ define( 'src/controllers/buzz',
 
 		var _showBlockPopupMenu = function(event, id) {
 			var items = [{
-				id: '0',
+				id: 'delete',
 				title: 'Delete'
 			}];
 			popupmenu.show({
 				x: event.pageX,
 				y: event.pageY,
 				callback: function(item) {
-					// console.log('clicked block popup menu item', item);
-					$scope.deleteBlockOrConnection(id);
+					if (item.id == 'delete')
+						$scope.deleteBlockOrConnection(id);
 				},
 				items: items
 			});
