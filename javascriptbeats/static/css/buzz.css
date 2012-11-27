@@ -1,4 +1,4 @@
-dhtml {
+html {
 	height: 100%;
 }
 
@@ -6,7 +6,12 @@ body {
 	padding: 0;
 	margin: 0;
 	overflow: hidden;
+	font-family: Trebuchet MS, Helvetica, Arial;
 	font-size: 9pt;
+}
+
+h1,h2,h3,h4 {
+	font-family: "Helvetica Neue", Helvetica, Arial;
 }
 
 h1 {

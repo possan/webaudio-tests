@@ -147,6 +147,7 @@ define( 'src/controllers/buzz',
 			} catch(e) {
 			}
 			$('ul.blocks li').draggable({
+				scroll: false,
 				start: function() {
 					// hide canvas
 					$(this).addClass('dragging');
