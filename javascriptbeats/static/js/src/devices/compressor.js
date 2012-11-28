@@ -25,27 +25,27 @@ CompressorDevice.prototype.destroy = function() {
 
 CompressorDevice.prototype.update = function(track, state) {
 	if(track.values['threshold'].updated) {
-		var df = track.values['treshold'].value;
-		this.filter.threshold = -df;
+		var df = track.values['threshold'].value;
+		this.comp.threshold.value = -df;
 	}
 	if(track.values['knee'].updated) {
 		var df = track.values['knee'].value;
-		this.filter.knee.value = df;
+		this.comp.knee.value = df;
 	}
 	if(track.values['ratio'].updated) {
 		var df = track.values['ratio'].value;
-		this.filter.ratio.value = df;
+		this.comp.ratio.value = df;
 	}
 	if(track.values['reduction'].updated) {
 		var df = track.values['reduction'].value;
-		this.filter.reduction.value = -df;
+		this.comp.reduction.value = -df;
 	}
 	if(track.values['attack'].updated) {
 		var df = track.values['attack'].value;
-		this.filter.attack.value = df / 1000.0;
+		this.comp.attack.value = df / 1000.0;
 	}
 	if(track.values['release'].updated) {
 		var df = track.values['release'].value;
-		this.filter.release.value = df / 1000.0;
+		this.comp.release.value = df / 1000.0;
 	}
 }
