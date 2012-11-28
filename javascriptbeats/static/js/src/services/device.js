@@ -10,7 +10,7 @@ define('src/services/device', ['src/app'], function(app) {
 				{ type: 'delay', title: 'Delay' },
 			//	{ type: 'reverb', title: 'Reverb' },
 			//	{ type: 'waveshaper', title: 'Waveshaper' },
-			//	{ type: 'filter', title: 'Filter' },
+				{ type: 'filter', title: 'Filter' },
 			//	{ type: 'compressor', title: 'Compressor' },
 			];
 		}

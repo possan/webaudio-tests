@@ -81,6 +81,16 @@ define('src/services/help', ['src/app'], function(app) {
 			  { title: 'full bar', expression:'400' },
 			  { title: 'Slow whine', expression:'0.6 + 0.2 * Math.sin(time)' },
 			  { title: 'Fast echo mayhem', expression: '1.6 + 1.2 * Math.sin(time * 15)' }
+			],
+			'filtertype': [
+				{ title: 'Lowpass', expression: '0' },
+				{ title: 'Highpass', expression: '1' },
+				{ title: 'Bandpass', expression: '2' },
+				{ title: 'Lowshelf', expression: '3' },
+				{ title: 'Highshelf', expression: '4' },
+				{ title: 'Peaking', expression: '5' },
+				{ title: 'Notch', expression: '6' },
+				{ title: 'Allpass', expression: '7' }
 			]
 		}
 

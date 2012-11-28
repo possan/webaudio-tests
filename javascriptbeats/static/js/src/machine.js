@@ -383,6 +383,9 @@ Machine.prototype.createDeviceByType = function(type) {
 	if (type === 'master')
 		return new MasterDevice();
 
+	if (type === 'filter')
+		return new FilterDevice();
+
 	if (type === 'connection') // hack
 		return new Connection();
 
