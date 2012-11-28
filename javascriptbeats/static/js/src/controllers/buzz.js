@@ -88,7 +88,7 @@ define( 'src/controllers/buzz',
 					ctx.fill();
 				}
 			}
-			$scope.$apply();
+			// $scope.$apply();
 		}
 
 		var _makeDraggable = function() {
@@ -267,18 +267,42 @@ define( 'src/controllers/buzz',
 		}
 
 		var _showBlockPopupMenu = function(event, id) {
-			var items = [{
+
+			var b = machine.getTrackById($scope.selected);
+			
+			var items = [];
+			if (b) {
+					items.push({
+						id: 'mute',
+						title: b.mute ? 'Unmute' : 'Mute',
+					});
+					items.push({
+						id: 'solo',
+						title: b.solo ? 'Unsolo' : 'Solo',
+					});
+			}
+			items.push({
 				id: 'delete',
 				title: 'Delete'
-			}];
+			});
+
 			popupmenu.show({
 				x: event.pageX,
 				y: event.pageY,
+				items: items,
 				callback: function(item) {
-					if (item.id == 'delete')
+					if (item.id == 'delete') {
 						$scope.deleteBlockOrConnection(id);
-				},
-				items: items
+					}
+					if (item.id == 'mute') {
+						b.mute = !b.mute;
+						machine.updateMutes();
+					}
+					if (item.id == 'solo') {
+						b.solo = !b.solo;
+						machine.updateMutes();
+					}
+				}
 			});
 		}
 
@@ -963,17 +987,79 @@ define( 'src/controllers/buzz',
 
 		$(window).keyup(function(event) {
 			if (event.srcElement.tagName != 'INPUT') {
+				console.log('key', event.keyCode , event);
 				if (event.keyCode == 32) {
+					// space
 					$scope.toolbarPlay();
-					event.preventDefault();
+					$scope.$apply();
+					return false;
+				}
+				if (event.keyCode == 68) {
+					// "D"
+					$scope.deleteBlockOrConnection();
+					_setSidebar('song');
+					$scope.$apply();
 					return false;
 				}
 				if (event.keyCode == 46) {
+					// delete
 					$scope.deleteBlockOrConnection();
 					_setSidebar('song');
+					$scope.$apply();
+					return false;
 				}
+				if (event.keyCode == 83) {
+					if (event.ctrlKey) {
+						// "S" (save)
+						if ($scope.can_create)
+							$scope.toolbarCreate();
+						else if ($scope.can_save)
+							$scope.toolbarSave();
+					} else {
+						// "S" (solo)
+						var b = machine.getTrackById($scope.selected);
+						if (b)
+							b.solo = !b.solo;
+						machine.updateMutes();
+					}
+					$scope.$apply();
+					return false;
+				}
+				if (event.keyCode == 77) {
+					// "M" (mute)
+					var b = machine.getTrackById($scope.selected);
+					if (b)
+						b.mute = !b.mute;
+					machine.updateMutes();
+					$scope.$apply();
+					return false;
+				}
+				if (event.keyCode == 9) {
+					// tab
+					return false;
+				}
+				if (event.keyCode == 65) {
+					// "A"
+					$scope.toolbarAdd();
+					$scope.$apply();
+					return false;
+				}
+				if (event.keyCode == 112) {
+					// f1
+					$scope.toolbarHelp();
+					$scope.$apply();
+					return false;
+				}
+				if (event.keyCode == 67) {
+					// "C"
+					$scope.toolbarCenter();
+					$scope.$apply();
+					return false;
+				}
+				// 1 = 49
+				// 9 = 57
+				// 0 = 48
 			}
-
 			return false;
 		});
 	});

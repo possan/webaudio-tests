@@ -95,6 +95,24 @@ ul.blocks li span {
 	text-align: center;
 }
 
+ul.blocks li span.solo {
+	position: absolute;
+	left: -10px;
+	top: -13px;
+	width: 40px;
+	color: #070;
+	font-size: 80%;
+}
+
+ul.blocks li span.mute {
+	position: absolute;
+	left: 15px;
+	top: -13px;
+	width: 40px;
+	color: #f00;
+	font-size: 80%;
+}
+
 ul.connections {
 	position: absolute;
 	left: 0px;

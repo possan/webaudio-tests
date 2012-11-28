@@ -14,9 +14,9 @@
 	<link rel="stylesheet" href="/static/css/smoothness/jquery-ui-1.9.1.custom.css" />
 	<script>
 		window.appSessionId = '{{ session }}';
-		window.appCanFork = '{{ can_fork }}';
-		window.appCanSave = '{{ can_save }}';
-		window.appCanCreate = '{{ can_create }}';
+		window.appCanFork = ('{{ can_fork }}' == 'True');
+		window.appCanSave = ('{{ can_save }}' == 'True');
+		window.appCanCreate = ('{{ can_create }}' == 'True');
 		window.appDocumentId = '{{ document }}';
 		try {
 			window.appDocument = {{ data }};
@@ -65,6 +65,8 @@
 			<li ng-repeat="b in blocks" ng-style="getBlockPosition(b)" data-id="{{'{{b.id}}'}}" data-index="{{'{{b.index}}'}}">
 				<img ng-src="/static/img/device_{{'{{b.type}}'}}_40.png" />
 				<span>{{'{{b.title}}'}}</span>
+				<span ng-show="b.mute" class="mute">mute</span>
+				<span ng-show="b.solo" class="solo">solo</span>
  			</li>
 		</ul>
 	</div>

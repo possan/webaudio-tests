@@ -89,6 +89,28 @@ Machine.prototype.isPlaying = function() {
 	return this.sequencer.isPlaying();
 }
 
+Machine.prototype.updateMutes = function() {
+	var nsolo = 0;
+	for(var i=0; i<this.tracks.length; i++) {
+		var id = this.tracks[i];
+		var track = this.trackmap[id];
+		if (track.solo)
+			nsolo ++;
+	}
+	for(var i=0; i<this.tracks.length; i++) {
+		var id = this.tracks[i];
+		var track = this.trackmap[id];
+		var silent = false;
+		if (nsolo > 0) {
+			silent = !(track.solo || false);
+		} else {
+			silent = (track.mute || false);
+		}
+		console.log('set track #'+i+' ('+id+') to silent='+silent);
+		track.setData({ silent: silent });
+	}
+}
+
 var addDynamicValueTracks = function(target, intrack) {
 	for (var i=0; i<target.device.parameters.length; i++) {
 		var p = target.device.parameters[i];
