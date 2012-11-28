@@ -88,7 +88,7 @@ define( 'src/controllers/buzz',
 					ctx.fill();
 				}
 			}
-			// $scope.$apply();
+			$scope.$apply();
 		}
 
 		var _makeDraggable = function() {
@@ -115,6 +115,7 @@ define( 'src/controllers/buzz',
 							// connect block shortcut, select one, shift-click the destination..
 							editorService.connectBlocks($scope.selected, this.dataset.id);
 							_reloadView();
+							$scope.$apply();
 						} else {
 							$scope.setSelection(this.dataset.id);
 						}

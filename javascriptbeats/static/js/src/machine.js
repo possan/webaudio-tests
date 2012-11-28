@@ -386,6 +386,12 @@ Machine.prototype.createDeviceByType = function(type) {
 	if (type === 'filter')
 		return new FilterDevice();
 
+	if (type === 'gain')
+		return new GainDevice();
+
+	if (type === 'compressor')
+		return new CompressorDevice();
+
 	if (type === 'connection') // hack
 		return new Connection();
 
