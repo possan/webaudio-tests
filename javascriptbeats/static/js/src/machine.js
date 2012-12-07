@@ -392,6 +392,9 @@ Machine.prototype.createDeviceByType = function(type) {
 	if (type === 'compressor')
 		return new CompressorDevice();
 
+	if (type === 'waveshaper')
+		return new WaveshaperDevice();
+
 	if (type === 'connection') // hack
 		return new Connection();
 
