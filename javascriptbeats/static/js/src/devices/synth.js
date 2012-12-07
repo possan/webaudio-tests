@@ -10,6 +10,9 @@ var SynthDevice = function() {
 	this.parameters.push({ id:'volume', type:'volume', title: 'Volume', substep: false, default: '100' });
 	this.parameters.push({ id:'waveform', type:'waveform', title: 'Waveform', substep: false, default: '1' });
 	this.parameters.push({ id:'filterenv', type:'filterenv', title: 'Filter env', substep: false, default: '0' });
+	this.parameters.push({ id:'waveform2', type:'waveform', title: 'Osc 2 Waveform', substep: false, default: '0' });
+	this.parameters.push({ id:'speed2', type:'speed', title: 'Osc 2 Speed', substep: false, default: '0' });
+	this.parameters.push({ id:'mix2', type:'', title: 'Osc 2 Ringmod', substep: false, default: '0' });
 };
 
 SynthDevice.prototype = new BaseDevice();
@@ -47,6 +50,19 @@ SynthDevice.prototype.update = function(track, state) {
 		source.type = track.values['waveform'].value;
 		source.frequency.value = freq;
 
+		var source2 = this.machine.context.createOscillator();
+		source2.type = track.values['waveform2'].value;
+		source2.frequency.value = freq * track.values['speed2'].value;
+
+		var s2gain = this.machine.context.createGainNode();
+		s2gain.gain.value = track.values['mix2'].value;
+		source2.connect(s2gain);
+
+		var ringmod = this.machine.context.createGainNode();
+		source.connect(ringmod);
+		s2gain.connect(ringmod.gain);
+		ringmod.gain.value = 1 - track.values['mix2'].value;
+
 		var release = 1.0 * track.values['release'].value;
 		var fenv = Math.round(track.values['filterenv'].value);
 		if (fenv != 0)
@@ -59,15 +75,17 @@ SynthDevice.prototype.update = function(track, state) {
 		var gainNode = this.machine.context.createGainNode();
   	gainNode.gain.setValueAtTime(track.values['volume'].value / 100.0, this.machine.context.currentTime);
     gainNode.gain.linearRampToValueAtTime(0.0, this.machine.context.currentTime + release / 1000.0);
-		source.connect(gainNode);
+		ringmod.connect(gainNode);
 
 		gainNode.connect(this.filter);
 
 			// gateindicator.className = 'indicator on';
 		source.noteOn(0);
+		source2.noteOn(0);
 		setTimeout(function() {
  			// gateindicator.className = 'indicator';
 			source.noteOff(0);
+			source2.noteOff(0);
 		}, release);
 	}
 }
