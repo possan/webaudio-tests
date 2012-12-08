@@ -395,6 +395,9 @@ Machine.prototype.createDeviceByType = function(type) {
 	if (type === 'waveshaper')
 		return new WaveshaperDevice();
 
+	if (type === 'reverb')
+		return new ReverbDevice();
+
 	if (type === 'connection') // hack
 		return new Connection();
 
