@@ -15,11 +15,27 @@ define('src/app', ['lib/angular'], function(angularPlaceholder) {
 	app.machine = new Machine(context);
 
 	app.machine.sampler.load([
-		{ url: '/static/audio/808kick3.mp3', name: '808 Kick' },
-		{ url: '/static/audio/808snare1.mp3', name: '808 Snare' },
-		{ url: '/static/audio/808chh1.mp3', name: '808 Closed Hihat' },
-		{ url: '/static/audio/808clap.mp3', name: '808 Clap' },
-		{ url: '/static/audio/808kick1.mp3', name: '808 Kick 2' }
+		{ url: '/static/audio/808kick3.mp3', name: '#0 808: Kick' },
+		{ url: '/static/audio/808snare1.mp3', name: '#1 808: Snare' },
+		{ url: '/static/audio/808chh1.mp3', name: '#2 808: Closed Hihat' },
+		{ url: '/static/audio/808clap.mp3', name: '#3 808: Clap' },
+		{ url: '/static/audio/808kick1.mp3', name: '#4 808: Kick 2' },
+
+		{ url: '/static/audio/misc-clap1.mp3', name: '#5 Misc: Clap 1' },
+		{ url: '/static/audio/misc-clap2.mp3', name: '#6 Misc: Clap 2' },
+		{ url: '/static/audio/misc-cymbal1.mp3', name: '#7 Misc: Cymbal 1' },
+		{ url: '/static/audio/misc-deepbass.mp3', name: '#8 Misc: Deep bass' },
+		{ url: '/static/audio/misc-kick1.mp3', name: '#9 Misc: Kick 1' },
+		{ url: '/static/audio/misc-ping.mp3', name: '#10 Misc: Ping' },
+		{ url: '/static/audio/misc-shaker1.mp3', name: '#11 Misc: Shaker 1' },
+		{ url: '/static/audio/misc-snare1.mp3', name: '#12 Misc: Snare 1' },
+		{ url: '/static/audio/misc-snare2.mp3', name: '#13 Misc: Snare 2' },
+
+		{ url: '/static/audio/reverb-brightlargehall.mp3', name: '#14 Reverb: Bright large hall' },
+		{ url: '/static/audio/reverb-concerthall.mp3', name: '#15 Reverb: Concert hall' },
+		{ url: '/static/audio/reverb-gigaverb.mp3', name: '#16 Reverb: Gigaverb' },
+		{ url: '/static/audio/reverb-greathall.mp3', name: '#17 Reverb: Great Hall' },
+		{ url: '/static/audio/reverb-statecapitol.mp3', name: '#18 Reverb: State capitol' },
 	]);
 
 	/*

@@ -16,6 +16,13 @@ define('src/services/help', ['src/app'], function(app) {
 			'delayfeedback': 'Delay feedback in percent',
 		};
 
+		var samples = [];
+		for (var i=0; i<app.machine.sampler.names.length; i++)
+			samples.push({ title: app.machine.sampler.names[i], expression: ''+i });
+
+		samples.push({ title: 'Simple beat sequencer', expression: '[0,99,2,99,1,99,2,99,0,99,2,99,1,3,2,1][step%16]' });
+
+
 		var presets = {
 			'volume': [
 				{ title: 'Zero', expression: '0' },
@@ -46,7 +53,8 @@ define('src/services/help', ['src/app'], function(app) {
 				// { title: '4 - Custom', expression: '3' },
 				{ title: 'Random', expression: 'Math.floor(Math.random() * 4)' },
 			],
-			'sample': [
+			'sample': samples,
+			/*
 				{ title: '00 - 808 Kick', expression: '0' },
 				{ title: '01 - 808 Snare', expression: '1' },
 				{ title: '02 - 808 Closed hat', expression: '2' },
@@ -60,7 +68,7 @@ define('src/services/help', ['src/app'], function(app) {
 			//	{ title: '10 - 808 Kick', expression: '10' },
 				{ title: 'Random', expression: 'Math.floor(Math.random() * 10)' },
 				{ title: 'Simple beat sequencer', expression: '[0,99,2,99,1,99,2,99,0,99,2,99,1,3,2,1][step%16]' },
-			],
+			], */
 			'cutoff': [
 				{ title: 'No cutoff', expression: '22050' },
 				{ title: '1000 hz', expression: '1000' },
